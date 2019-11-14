@@ -7,9 +7,11 @@
 #include <cstring>
 #include <limits>
 #include <sstream>
+#include <iomanip>
 #include <set>
 #include <cmath>
 #include "my_vector.h"
+#include "curve.h"
 #include "utils.h"
 #include <chrono> // time measurements
 #include <time.h>
@@ -59,7 +61,7 @@ int main(int argc, char *argv[])
   //test chamber
 
   //
-
+  std::setprecision(14);
   bool complete = false;
   bool iset = false; ////an oxi orisma grammis entolos, 8a parw ta files apo path pou grafei o user
   bool cset = false;
@@ -149,32 +151,74 @@ int main(int argc, char *argv[])
     std::cin >> dataset_path;
   }
 
+  std::string what_is_the_input;
   int n = 0;                          //plithos twn vectors tou input file
   std::ifstream infile(dataset_path); //dataset: me tabs anamesa, ka8e grammi: id1    x11     x12     x13...
   std::string line;
-  std::vector<my_vector<int>> vectors_array;
+  std::vector<my_vector<double>> vectors_array; //pinakas gia vectors
+  std::vector<curve<double>> curves_array; //pinakas gia kampyles
   while (std::getline(infile, line))
   { //read files
-    my_vector<int> one_v_atime(line);
-    //std::cout << one_v_atime.get_id()  <<"\n" ;
-    vectors_array.push_back(one_v_atime);
-    n++;
+    if(line == "vectors"){
+      what_is_the_input = "vectors";
+      continue;
+    }
+
+    if(line == "curves"){
+      what_is_the_input = "curves";
+      continue;
+    }
+
+    if(what_is_the_input == "vectors"){ // exoume na kanoyme me vectors
+      my_vector<double> one_v_atime(line);
+      //std::cout << one_v_atime.get_id()  <<"\n" ;
+      vectors_array.push_back(one_v_atime);
+      //std::cout << one_v_atime.get_id() << "\n";
+      n++;
+    }
+
+    if(what_is_the_input == "curves"){ // exoume na kanoyme me vectors
+      curve<double> one_v_atime(line);
+      //std::cout << one_v_atime.get_id()  <<"\n" ;
+      curves_array.push_back(one_v_atime);
+      n++;
+    }
+
   };
   infile.close();
-
-  //random initialization se uparxonta vectors
-  std::vector<my_vector<int>> cluster_centers; //ta arxika kentra twn clusters mas
-  cluster_centers = initialise_centers(number_of_clusters, n, &vectors_array);
-
-  for (unsigned int i = 0; i < cluster_centers.size(); i++)
-  {
-    std::cout << "Eimai to kentro " << cluster_centers[i].get_id() << "\n";
-    std::vector<int> temp = cluster_centers[i].get_v();
-    for (unsigned int j = 0; j < temp.size(); j++)
-    {
-      std::cout << temp[j] << " ";
+  //KSEKINAME ANALOGWS TO INPUT TYPE
+  if(what_is_the_input == "vectors"){ //EXOUME NA KANOYME ME VECTORS
+    for(int i =0; i< vectors_array.size(); i++){
+      for(int j=0; j< vectors_array[i].get_v().size(); j++)
+        std::cout << std::setprecision(20) << vectors_array[i].get_v()[j] << " ";
+      std::cout << "\n";
     }
-    std::cout << "\n";
+
+    //random initialization se uparxonta vectors
+    /*std::vector<my_vector<int>> cluster_centers; //ta arxika kentra twn clusters mas
+    cluster_centers = initialise_centers(number_of_clusters, n, &vectors_array);
+
+    for (unsigned int i = 0; i < cluster_centers.size(); i++)
+    {
+      std::cout << "Eimai to kentro " << cluster_centers[i].get_id() << "\n";
+      std::vector<int> temp = cluster_centers[i].get_v();
+      for (unsigned int j = 0; j < temp.size(); j++)
+      {
+        std::cout << temp[j] << " ";
+      }
+      std::cout << "\n";
+    }*/
+    //otan teleiwsei auto to init, cluster_centers.clear() kai meta kanoume to epomeno init!
+
   }
-  //otan teleiwsei auto to init, cluster_centers.clear() kai meta kanoume to epomeno init!
+  else if(what_is_the_input == "curves"){
+
+  }
+  else{
+    std::cout << "Den orises ti typou dedomena exoyme sthn prwth grammh opws eipe h ekfnwhsh, Enjoy the exit :* xoxo\n";
+    exit(-1);
+  }
+
+
+
 }

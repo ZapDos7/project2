@@ -5,8 +5,10 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iostream>
 #include <stdlib.h> //atoi
 #include <cctype>   //isdigit
+#include <cstring>
 
 template <class T>
 class my_vector

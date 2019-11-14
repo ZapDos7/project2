@@ -18,7 +18,7 @@ my_vector<T>::my_vector(std::vector<T> v_to_be, std::string id_to_be)
 template <class T>
 my_vector<T>::my_vector(std::string inp)
 {
-    vector<string> tokens;
+    /*vector<string> tokens;
     stringstream check1(inp);
 
     string intermediate;
@@ -37,6 +37,24 @@ my_vector<T>::my_vector(std::string inp)
         int dimens_i = 0;
         tool >> dimens_i;
         vec.push_back(dimens_i); //vazei sto vector kathe stoixeio-diastash tou dianusmatos apo to input string
+    }*/
+    char comtool[inp.length()];
+    strcpy(comtool, inp.c_str());
+    char delimiter[]=" \t\r\n\v\f\0";
+    //cmnd = strtok(comtool, delimiter);
+    char *token = std::strtok(comtool, delimiter);
+    std::string the_id(token);
+    //std::cout << the_id;
+    my_vector<T>::set_id(the_id);
+    token = std::strtok(NULL, delimiter);
+    while (token != NULL) { //oi diastaseis tou dianusmatos
+        //std::cout << token << '\n';
+        string gi(token);
+        stringstream tool(gi);
+        T dimens_i = 0;
+        tool >> dimens_i;
+        vec.push_back(dimens_i); //vazei sto vector kathe stoixeio-diastash tou dianusmatos apo to input string
+        token = std::strtok(NULL, delimiter);
     }
 }
 
@@ -80,7 +98,7 @@ string my_vector<T>::get_id()
 template <class T>
 int my_vector<T>::get_id_as_int()
 {
-    /*string tmp = id;
+    string tmp = id;
     int my_id = 0;
     for (unsigned int i = 0; i < id.length(); i++)
     {
@@ -91,11 +109,11 @@ int my_vector<T>::get_id_as_int()
             break;
         }
     }
-    return my_id;*/
+    return my_id;
     //gia to input ths ekfwnhshs, poy htan kai sthn 1h ergasia
-    string tmp = id;
+    /*string tmp = id;
     int my_id2 = atoi(tmp.c_str()); //exoun mono mia leksh(arithmo) ws id
-    return my_id2;
+    return my_id2;*/
 }
 
 template <class T>
