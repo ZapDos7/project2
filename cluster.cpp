@@ -2,7 +2,7 @@
 #include <string.h>
 #include <fstream>
 #include <typeinfo>
-#include <stdlib.h>
+#include <stdlib.h> //rand?
 #include <algorithm> // std::count
 #include <cstring>
 #include <limits>
@@ -12,8 +12,46 @@
 #include "my_vector.h"
 #include "utils.h"
 #include <chrono> // time measurements
+#include <time.h>
 
 std::string repeat_answer = "n";
+
+//random init
+std::vector<my_vector<int>> initialise_centers(int clusters, int plithos_vectors, std::vector<my_vector<int>> *vectors_array) {
+  srand(time(NULL));
+  std::set<int> ids;
+  for (int i = 0; i < clusters; i++)
+  { //epilegw tuxaio int anamesa sto 0 kai to n
+    int rand_id = rand()%plithos_vectors;
+    while (ids.find(rand_id) != ids.end()) //uparxei hdh auto pou brhke h rand
+    {
+      rand_id = rand()%plithos_vectors;
+    }
+    ids.insert(rand_id); //en telei bazw to unique value sto set m
+  }
+  std::vector<int> v_ids(ids.begin(), ids.end()); //epistrefw to set alla se vector apo id
+  std::vector<my_vector<int>> ta_kentra;
+  ta_kentra.clear();
+  for (int i = 0; i < clusters; i++)
+  {
+    my_vector<int> one_v_atime;
+    one_v_atime.set_id((*vectors_array)[v_ids[i]].get_id());
+    one_v_atime.set_v((*vectors_array)[v_ids[i]].get_v());
+    ta_kentra.push_back(one_v_atime);
+  }
+  if (ta_kentra.size() != (unsigned int)clusters)
+  {
+    std::cerr << "Error in initialise_centers.\n";
+    exit(-2);
+  }
+  return ta_kentra;
+}
+
+//kmeans++
+std::vector<my_vector<int>> initialise_centers_plus(int clusters){
+
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -83,24 +121,32 @@ int main(int argc, char *argv[])
     };
     confile.close();
     //ask values of essential vars (not default)
-    if(number_of_vector_hash_functions < 0){
+    while(number_of_vector_hash_functions < 0){
       std::cout << "number of hash functions not defined. Provide it:\n";
       std::cin >> number_of_vector_hash_functions;
     }
-    if(number_of_clusters < 0){
+    while(number_of_clusters < 0){
       std::cout << "number of clusters not defined. Provide it:\n";
       std::cin >> number_of_clusters;
     }
   }
   else{ //keep default values and ask the 2 essentials (not default)
-    if(number_of_vector_hash_functions < 0){
+    while(number_of_vector_hash_functions < 0){
       std::cout << "number of hash functions not defined. Provide it:\n";
       std::cin >> number_of_vector_hash_functions;
     }
-    if(number_of_clusters < 0){
+    while(number_of_clusters < 0){
       std::cout << "number of clusters not defined. Provide it:\n";
       std::cin >> number_of_clusters;
     }
+  }
+
+  //EAN DEN ORISTHKE APO GRAMMH ENTOLWN, DWSE MONOPATI DATASET:
+  if (iset == false)
+  {
+    std::cout << "Define dataset path:\n";
+    std::string inp1;
+    std::cin >> dataset_path;
   }
 
   int n = 0;                          //plithos twn vectors tou input file
@@ -116,6 +162,19 @@ int main(int argc, char *argv[])
   };
   infile.close();
 
+  //random initialization se uparxonta vectors
+  std::vector<my_vector<int>> cluster_centers; //ta arxika kentra twn clusters mas
+  cluster_centers = initialise_centers(number_of_clusters, n, &vectors_array);
 
-
+  for (unsigned int i = 0; i < cluster_centers.size(); i++)
+  {
+    std::cout << "Eimai to kentro " << cluster_centers[i].get_id() << "\n";
+    std::vector<int> temp = cluster_centers[i].get_v();
+    for (unsigned int j = 0; j < temp.size(); j++)
+    {
+      std::cout << temp[j] << " ";
+    }
+    std::cout << "\n";
+  }
+  //otan teleiwsei auto to init, cluster_centers.clear() kai meta kanoume to epomeno init!
 }
