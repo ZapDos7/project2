@@ -80,7 +80,7 @@ string my_vector<T>::get_id()
 template <class T>
 int my_vector<T>::get_id_as_int()
 {
-    string tmp = id;
+    /*string tmp = id;
     int my_id = 0;
     for (unsigned int i = 0; i < id.length(); i++)
     {
@@ -91,7 +91,11 @@ int my_vector<T>::get_id_as_int()
             break;
         }
     }
-    return my_id;
+    return my_id;*/
+    //gia to input ths ekfwnhshs, poy htan kai sthn 1h ergasia
+    string tmp = id;
+    int my_id2 = atoi(tmp.c_str()); //exoun mono mia leksh(arithmo) ws id
+    return my_id2;
 }
 
 template <class T>
