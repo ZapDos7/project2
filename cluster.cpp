@@ -7,6 +7,7 @@
 #include <cstring>
 #include <limits>
 #include <sstream>
+#include <unordered_map>
 #include <iomanip>
 #include <set>
 #include <cmath>
@@ -155,7 +156,8 @@ int main(int argc, char *argv[])
   int n = 0;                          //plithos twn vectors tou input file
   std::ifstream infile(dataset_path); //dataset: me tabs anamesa, ka8e grammi: id1    x11     x12     x13...
   std::string line;
-  std::vector<my_vector<double>> vectors_array; //pinakas gia vectors
+  //std::vector<my_vector<double>> vectors_array; //pinakas gia vectors
+  std::unordered_map<std::string, my_vector<double> > vectors_array; //key == id tou vector, mapped value == my_vectors. Ta ids einai o,ti nai nai g auto....
   std::vector<curve<double>> curves_array; //pinakas gia kampyles
   while (std::getline(infile, line))
   { //read files
@@ -172,7 +174,8 @@ int main(int argc, char *argv[])
     if(what_is_the_input == "vectors"){ // exoume na kanoyme me vectors
       my_vector<double> one_v_atime(line);
       //std::cout << one_v_atime.get_id()  <<"\n" ;
-      vectors_array.push_back(one_v_atime);
+      vectors_array[one_v_atime.get_id()] = one_v_atime;
+      //vectors_array.push_back(one_v_atime);
       //std::cout << one_v_atime.get_id() << "\n";
       n++;
     }
@@ -188,11 +191,18 @@ int main(int argc, char *argv[])
   infile.close();
   //KSEKINAME ANALOGWS TO INPUT TYPE
   if(what_is_the_input == "vectors"){ //EXOUME NA KANOYME ME VECTORS
-    for(int i =0; i< vectors_array.size(); i++){
-      for(int j=0; j< vectors_array[i].get_v().size(); j++)
-        std::cout << std::setprecision(20) << vectors_array[i].get_v()[j] << " ";
+
+    //edw mporeis na tsekareis oti ta inputs apo8hkeuthkan ok
+    /*int jujuju = 0;
+    for(auto x:vectors_array){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
+      std::cout << x.first << x.second.get_id() << "\n";
+      for(unsigned int i=0; i< x.second.get_v().size(); i++)
+        std::cout << std::setprecision(12) << x.second.get_v()[i] << " ";
       std::cout << "\n";
+      jujuju +=1;
     }
+    std::cout << jujuju;*/
+
 
     //random initialization se uparxonta vectors
     /*std::vector<my_vector<int>> cluster_centers; //ta arxika kentra twn clusters mas
