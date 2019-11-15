@@ -20,26 +20,33 @@
 std::string repeat_answer = "n";
 
 //random init
-std::vector<my_vector<int>> initialise_centers(int clusters, int plithos_vectors, std::vector<my_vector<int>> *vectors_array) {
+template <typename T>
+std::vector<my_vector<T>> initialise_centers(int clusters, std::unordered_map<std::string, my_vector<T>> *vectors_array) {
   srand(time(NULL));
   std::set<int> ids;
+  //logw anwmalias do8entwn input files, prepei na kanoyme workaround auto to problhma...
+  std::vector<std::string> keys;
+  for(auto kv : *vectors_array)
+    keys.push_back(kv.first);
+
+
   for (int i = 0; i < clusters; i++)
   { //epilegw tuxaio int anamesa sto 0 kai to n
-    int rand_id = rand()%plithos_vectors;
+    int rand_id = rand()%keys.size();
     while (ids.find(rand_id) != ids.end()) //uparxei hdh auto pou brhke h rand
     {
-      rand_id = rand()%plithos_vectors;
+      rand_id = rand()%keys.size();
     }
     ids.insert(rand_id); //en telei bazw to unique value sto set m
   }
   std::vector<int> v_ids(ids.begin(), ids.end()); //epistrefw to set alla se vector apo id
-  std::vector<my_vector<int>> ta_kentra;
+  std::vector<my_vector<T>> ta_kentra;
   ta_kentra.clear();
   for (int i = 0; i < clusters; i++)
   {
-    my_vector<int> one_v_atime;
-    one_v_atime.set_id((*vectors_array)[v_ids[i]].get_id());
-    one_v_atime.set_v((*vectors_array)[v_ids[i]].get_v());
+    my_vector<T> one_v_atime;
+    one_v_atime.set_id((*vectors_array)[keys[v_ids[i]]].get_id());
+    one_v_atime.set_v((*vectors_array)[keys[v_ids[i]]].get_v());
     ta_kentra.push_back(one_v_atime);
   }
   if (ta_kentra.size() != (unsigned int)clusters)
@@ -205,13 +212,13 @@ int main(int argc, char *argv[])
 
 
     //random initialization se uparxonta vectors
-    /*std::vector<my_vector<int>> cluster_centers; //ta arxika kentra twn clusters mas
-    cluster_centers = initialise_centers(number_of_clusters, n, &vectors_array);
-
+    std::vector<my_vector<double>> cluster_centers; //ta arxika kentra twn clusters mas
+    cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
+    /*edw mporeis na tsekareis oti ta kentra einai ok
     for (unsigned int i = 0; i < cluster_centers.size(); i++)
     {
       std::cout << "Eimai to kentro " << cluster_centers[i].get_id() << "\n";
-      std::vector<int> temp = cluster_centers[i].get_v();
+      std::vector<double> temp = cluster_centers[i].get_v();
       for (unsigned int j = 0; j < temp.size(); j++)
       {
         std::cout << temp[j] << " ";
