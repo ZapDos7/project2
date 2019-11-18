@@ -1,7 +1,7 @@
 CC=g++  -std=c++11
 CFLAGS=-c -Wpedantic -Ofast
 LDFLAGS=
-SOURCES=cluster.cpp my_vector.cpp curve.cpp curve_point.cpp
+SOURCES=cluster.cpp my_vector.cpp curve.cpp curve_point.cpp cluster_object.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=cluster
 

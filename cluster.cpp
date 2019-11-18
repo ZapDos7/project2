@@ -13,6 +13,7 @@
 #include <cmath>
 #include "my_vector.h"
 #include "curve.h"
+#include "cluster_object.h"
 #include "utils.h"
 #include <chrono> // time measurements
 #include <time.h>
