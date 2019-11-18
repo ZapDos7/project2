@@ -2,6 +2,13 @@
 using namespace std;
 
 template <class T>
+cluster<T>::cluster(my_vector<T> * c){
+  set_of_points.clear();
+  set_center(c);
+}
+
+
+template <class T>
 bool cluster<T>::center_is_real()
 {
     if(center.get_id().length() == 0) //den einai alh8ino dianusma tou dataset
@@ -44,6 +51,9 @@ void cluster<T>::discorporate_point(my_vector<T> * p) //vasei enos deikth se my_
 {
     set_of_points.erase(p->get_id());  //diagrafei entelws to sugkekrimeno entry apo to cluster
 }
+
+template <class T>
+cluster<T>::~cluster() {}
 
 
 

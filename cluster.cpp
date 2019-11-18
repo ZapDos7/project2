@@ -211,10 +211,17 @@ int main(int argc, char *argv[])
     }
     std::cout << jujuju;*/
 
-
-    //random initialization se uparxonta vectors
     std::vector<my_vector<double>> cluster_centers; //ta arxika kentra twn clusters mas
+    std::vector<cluster<double>> clusters; //ta arxika mas clusters
+
+///////////////INITIALIZATION 1 - RANDOM////////////////////////////////////////////////////
+
     cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
+    for(unsigned int i=0; i<cluster_centers.size(); i++){
+      cluster<double> onecatatime(&cluster_centers[i]);
+      clusters.push_back(onecatatime);
+    }
+
     /*edw mporeis na tsekareis oti ta kentra einai ok
     for (unsigned int i = 0; i < cluster_centers.size(); i++)
     {
@@ -227,6 +234,14 @@ int main(int argc, char *argv[])
       std::cout << "\n";
     }*/
     //otan teleiwsei auto to init, cluster_centers.clear() kai meta kanoume to epomeno init!
+
+///////////////////ASSIGNMENT 1- LLOYD'S //////////////////////////////////////////////////
+
+  /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
+  for(auto x:vectors_array){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
+    std::cout << x.first << x.second.get_id() << "\n";
+    }
+
 
   }
   else if(what_is_the_input == "curves"){
