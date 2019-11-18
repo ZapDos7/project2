@@ -18,51 +18,10 @@
 #include <chrono> // time measurements
 #include <time.h>
 
+#include "inits.hpp"
+#include "assign.hpp"
+
 std::string repeat_answer = "n";
-
-//random init
-template <typename T>
-std::vector<my_vector<T>> initialise_centers(int clusters, std::unordered_map<std::string, my_vector<T>> *vectors_array) {
-  srand(time(NULL));
-  std::set<int> ids;
-  //logw anwmalias do8entwn input files, prepei na kanoyme workaround auto to problhma...
-  std::vector<std::string> keys;
-  for(auto kv : *vectors_array)
-    keys.push_back(kv.first);
-
-
-  for (int i = 0; i < clusters; i++)
-  { //epilegw tuxaio int anamesa sto 0 kai to n
-    int rand_id = rand()%keys.size();
-    while (ids.find(rand_id) != ids.end()) //uparxei hdh auto pou brhke h rand
-    {
-      rand_id = rand()%keys.size();
-    }
-    ids.insert(rand_id); //en telei bazw to unique value sto set m
-  }
-  std::vector<int> v_ids(ids.begin(), ids.end()); //epistrefw to set alla se vector apo id
-  std::vector<my_vector<T>> ta_kentra;
-  ta_kentra.clear();
-  for (int i = 0; i < clusters; i++)
-  {
-    my_vector<T> one_v_atime;
-    one_v_atime.set_id((*vectors_array)[keys[v_ids[i]]].get_id());
-    one_v_atime.set_v((*vectors_array)[keys[v_ids[i]]].get_v());
-    ta_kentra.push_back(one_v_atime);
-  }
-  if (ta_kentra.size() != (unsigned int)clusters)
-  {
-    std::cerr << "Error in initialise_centers.\n";
-    exit(-2);
-  }
-  return ta_kentra;
-}
-
-//kmeans++
-std::vector<my_vector<int>> initialise_centers_plus(int clusters){
-
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -217,13 +176,10 @@ int main(int argc, char *argv[])
 ///////////////INITIALIZATION 1 - RANDOM////////////////////////////////////////////////////
 
     cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
-    for(unsigned int i=0; i<cluster_centers.size(); i++){
-      cluster<double> onecatatime(&cluster_centers[i]);
-      clusters.push_back(onecatatime);
-    }
+    initialize_clusters(&cluster_centers, &clusters);
 
-    /*edw mporeis na tsekareis oti ta kentra einai ok
-    for (unsigned int i = 0; i < cluster_centers.size(); i++)
+    //edw mporeis na tsekareis oti ta kentra einai ok
+    /*for (unsigned int i = 0; i < cluster_centers.size(); i++)
     {
       std::cout << "Eimai to kentro " << cluster_centers[i].get_id() << "\n";
       std::vector<double> temp = cluster_centers[i].get_v();
@@ -235,12 +191,31 @@ int main(int argc, char *argv[])
     }*/
     //otan teleiwsei auto to init, cluster_centers.clear() kai meta kanoume to epomeno init!
 
+    //checkarw oti ta clusters einai ok
+    /*for (unsigned int i = 0; i < clusters.size(); i++)
+    {
+      std::cout << "Eimai to cluster " << clusters[i].get_center_id() << "kai eimai kala \n";
+      for (int j = 0; j < clusters[i].get_center_coords().size(); j++)
+      {
+        std::cout << clusters[i].get_center_coords()[j] << " " ;
+      }
+      std::cout << std::endl;
+    }*/
+
 ///////////////////ASSIGNMENT 1- LLOYD'S //////////////////////////////////////////////////
 
   /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
-  for(auto x:vectors_array){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
-    std::cout << x.first << x.second.get_id() << "\n";
+  lloyd_ass(&clusters, &vectors_array);
+  /*for(unsigned int i = 0; i < clusters.size(); i++){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
+    //std::cout << x.first << x.second.get_id() << "\n";
+    std::unordered_map<std::string, my_vector<double> * > * mpla = clusters[i].get_set_of_points();
+    std::cout << "Eimai to cluster " << clusters[i].get_center_id() << "\n";
+    for (auto x :(*mpla))
+    {
+      std::cout << x.first << " ";
     }
+    std::cout << std::endl;
+  }*/
 
 
   }

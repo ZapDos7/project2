@@ -55,7 +55,11 @@ void cluster<T>::discorporate_point(my_vector<T> * p) //vasei enos deikth se my_
 template <class T>
 cluster<T>::~cluster() {}
 
-
+template <class T>
+std::unordered_map<std::string, my_vector<T> * > *cluster<T>::get_set_of_points()
+{
+    return &set_of_points;
+}
 
 template class cluster<float>;
 template class cluster<int>;
