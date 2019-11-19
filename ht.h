@@ -36,7 +36,7 @@ public:
   ht<T>(int size_to_be, int k_to_be, int dimensions, double w_to_be);
   ~ht();
   void hash_vector(my_vector<T> *v);
-  std::vector<std::string> hash_query(my_vector<T> *q, double radius); //modified for range search
+  std::vector<std::string> hash_query(my_vector<T> *q, double radius, bool repetition); //modified for range search, repetition shmainei oti eimaste se 2h loypa gia diplasio radius
   //int get_vector_bucket_number(my_vector v);
 };
 

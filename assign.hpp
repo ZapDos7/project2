@@ -50,7 +50,7 @@ double initialize_radius(std::vector<cluster<T>>* clusters)
 
     }
   }
-  return init_radius;
+  return init_radius / 2;
 }
 
 
@@ -106,16 +106,18 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
       our_hash_tables.push_back(temp_hash_table);
     }
 
-    std::unordered_map<std::string, bool> owned; //to flag poy lene oi diafaneies gia to an kaparw8hke ena shmeio apo ena cluster
+    std::unordered_map<std::string, int> owned; //to flag poy lene oi diafaneies gia to an kaparw8hke ena shmeio apo ena cluster
+    int n =0;
     for (auto x :(*vectors_array)) //hasharw ta vectors k arxikopoiw flags
     {
       for (int j = 0; j < number_of_vector_hash_tables; j++)
         our_hash_tables[j].hash_vector(&(x.second));
 
-      owned[x.first] = false;
+      owned[x.first] = -1;
+      n++;
     }
 
-
+    int num_remaining = n; //posa exoun meinei xwris anathesh
     double radius = initialize_radius(clusters);
     std::vector<std::string> this_center_neighbs;
     std::vector<std::string> this_HT_neighbs;
@@ -124,14 +126,21 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
       this_center_neighbs.clear();
       for (int j = 0; j < number_of_vector_hash_tables; j++){
         this_HT_neighbs.clear();
-        this_HT_neighbs = our_hash_tables[j].hash_query((*clusters)[i].get_center_ptr(), radius);
+        this_HT_neighbs = our_hash_tables[j].hash_query((*clusters)[i].get_center_ptr(), radius, false);
         this_center_neighbs.insert(this_center_neighbs.end(), this_HT_neighbs.begin(), this_HT_neighbs.end());
       }
       //pros8hkh shmeiwn se cluster kai flag gia na mhn to paroyn kai ta ypoloipa clusters
       for(unsigned int z=0; z< this_center_neighbs.size(); z++){
-        if( owned[this_center_neighbs[z]] == false ){ //den exei kaparw8ei
+        if( owned[this_center_neighbs[z]] == -1 ){ //den exei kaparw8ei
             (*clusters)[i].incorporate_point(&((*vectors_array)[this_center_neighbs[z]]));
-            owned[this_center_neighbs[z]] = true; //to kaparwse
+            owned[this_center_neighbs[z]] = i; //to kaparwse
+        }
+        else{ //sugkrinoume me auton poy to exei kaparwsei
+          if(manhattan_distance((*vectors_array)[this_center_neighbs[z]].get_v() , (*clusters)[i].get_center_coords()) < manhattan_distance((*vectors_array)[this_center_neighbs[z]].get_v() , (*clusters)[owned[this_center_neighbs[z]]].get_center_coords()) ){
+            (*clusters)[owned[this_center_neighbs[z]]].discorporate_point(&((*vectors_array)[this_center_neighbs[z]])); //to bgazei ap to palio
+            (*clusters)[i].incorporate_point(&((*vectors_array)[this_center_neighbs[z]])); //to vazei sto neo
+            owned[this_center_neighbs[z]] = i; //to kaparwse
+          }
         }
       }
 
@@ -139,7 +148,7 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
     }
     //twra an kapoio exei meinei akaparwto, prepei na paei sto kontinotero tou kentro
     for(auto x: owned){
-      if(x.second == false){ //akaparwto
+      if(x.second == -1){ //akaparwto
         double min1 = std::numeric_limits<double>::max(); //apeiro
         int min_clust_index = -1; //to index tou cluster opou anoikei kathe x
         for (unsigned int j = 0; j < (*clusters).size(); j++)

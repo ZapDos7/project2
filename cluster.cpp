@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
     std::cout << "Eimai to cluster " << clusters[i].get_center_id() << "\n";
     for (auto x :(*mpla))
     {
-      std::cout << x.first << " ";
+      std::cout << x.second->get_id() << " ";
     }
     std::cout << std::endl;
   }

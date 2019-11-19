@@ -82,7 +82,7 @@ void ht<T>::hash_vector(my_vector<T> *v)
 }
 
 template <class T>
-std::vector<std::string> ht<T>::hash_query(my_vector<T> *q, double radius) //emploutismenh me elegxo radius
+std::vector<std::string> ht<T>::hash_query(my_vector<T> *q, double radius, bool repetition) //emploutismenh me elegxo radius
 {
     long int keyv = my_g.actual_g_function(*q); //ypologise thn timh ths g gia to vector v
     long int modded_keyv = our_mod(keyv, size); //kane thn timh auti mod table size
@@ -91,8 +91,15 @@ std::vector<std::string> ht<T>::hash_query(my_vector<T> *q, double radius) //emp
     for (unsigned int i = 0; i < table[modded_keyv].size(); i++)
     {
         //std::cout << table[modded_keyv][i].first->get_id_as_int() << "\n";
-        if( (table[modded_keyv][i].second == keyv) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) <= radius)  )                                    //prepei na exoyn to idio g epishs
-            this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id()); //valto sth lista pithanwn geitonwn
+        if(repetition == false){ //prwth fora, tsekare 0 < d <= r
+          if( (table[modded_keyv][i].second == keyv) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) <= radius)  )                                    //prepei na exoyn to idio g epishs
+              this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id()); //valto sth lista pithanwn geitonwn
+        }
+        else{ //kanoyme epanalhpsh, ara koita apo r_prev kai meta
+          if( (table[modded_keyv][i].second == keyv) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) <= radius) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) > radius/2)  )                                    //prepei na exoyn to idio g epishs
+              this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id()); //valto sth lista pithanwn geitonwn
+        }
+
         //std::cout << "my id is " << table[modded_keyv][i].first->get_id_as_int() << "\n";
     }
     /*std::cout << "brhka tous: ";
