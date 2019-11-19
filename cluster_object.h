@@ -19,6 +19,7 @@ public:
   bool center_is_real(); //self explanatory
   std::string get_center_id();
   std::vector<T> get_center_coords(); //epistrefei se morfh vector tis suntetagmenes kentrou
+  my_vector<T> * get_center_ptr();
   void incorporate_point(my_vector<T> * p); //enswmatwnei ena shmeio sto cluster
   void discorporate_point(my_vector<T> * p); //apoxwrizetai ena shmeio
   std::unordered_map<std::string, my_vector<T> * > *get_set_of_points();

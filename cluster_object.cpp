@@ -61,6 +61,12 @@ std::unordered_map<std::string, my_vector<T> * > *cluster<T>::get_set_of_points(
     return &set_of_points;
 }
 
+template <class T>
+my_vector<T> * cluster<T>::get_center_ptr()
+{
+    return &center;
+}
+
 template class cluster<float>;
 template class cluster<int>;
 template class cluster<double>;

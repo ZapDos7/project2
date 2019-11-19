@@ -15,6 +15,7 @@
 #include "curve.h"
 #include "cluster_object.h"
 #include "utils.h"
+#include "ht.h" //gia range search lsh
 #include <chrono> // time measurements
 #include <time.h>
 
@@ -121,6 +122,7 @@ int main(int argc, char *argv[])
 
   std::string what_is_the_input;
   int n = 0;                          //plithos twn vectors tou input file
+  int diastaseis_vecs; //self explanatory
   std::ifstream infile(dataset_path); //dataset: me tabs anamesa, ka8e grammi: id1    x11     x12     x13...
   std::string line;
   //std::vector<my_vector<double>> vectors_array; //pinakas gia vectors
@@ -141,7 +143,9 @@ int main(int argc, char *argv[])
     if(what_is_the_input == "vectors"){ // exoume na kanoyme me vectors
       my_vector<double> one_v_atime(line);
       //std::cout << one_v_atime.get_id()  <<"\n" ;
+      diastaseis_vecs = one_v_atime.get_v().size();
       vectors_array[one_v_atime.get_id()] = one_v_atime;
+
       //vectors_array.push_back(one_v_atime);
       //std::cout << one_v_atime.get_id() << "\n";
       n++;
@@ -205,8 +209,9 @@ int main(int argc, char *argv[])
 ///////////////////ASSIGNMENT 1- LLOYD'S //////////////////////////////////////////////////
 
   /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
-  lloyd_ass(&clusters, &vectors_array);
-  /*for(unsigned int i = 0; i < clusters.size(); i++){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
+  //lloyd_ass(&clusters, &vectors_array);
+  LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
+  for(unsigned int i = 0; i < clusters.size(); i++){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
     //std::cout << x.first << x.second.get_id() << "\n";
     std::unordered_map<std::string, my_vector<double> * > * mpla = clusters[i].get_set_of_points();
     std::cout << "Eimai to cluster " << clusters[i].get_center_id() << "\n";
@@ -215,7 +220,7 @@ int main(int argc, char *argv[])
       std::cout << x.first << " ";
     }
     std::cout << std::endl;
-  }*/
+  }
 
 
   }
