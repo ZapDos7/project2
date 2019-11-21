@@ -108,10 +108,11 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
 
     std::unordered_map<std::string, std::pair<int, double>> owned; //to flag poy lene oi diafaneies gia to an kaparw8hke ena shmeio kai apo poio index kai me poia aktina
     int n =0;
+    //for (auto x :(*vectors_array)) //hasharw ta vectors k arxikopoiw flags
     for (auto x :(*vectors_array)) //hasharw ta vectors k arxikopoiw flags
     {
       for (int j = 0; j < number_of_vector_hash_tables; j++)
-        our_hash_tables[j].hash_vector(&(x.second));
+        {our_hash_tables[j].hash_vector(&((*vectors_array)[x.first]));}
 
       std::pair<int, double> index_and_radius;
       index_and_radius.first = -1;
@@ -126,15 +127,11 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
     std::vector<std::string> this_HT_neighbs;
     bool repetition = false;
     int kill_countdown = 15; //an den exoun ginei nees anatheseis meta apo tosous diplasiasmous aktinas, stop
+    int num_unassigned_prev = num_unassigned; //arithmos unassigned shmeiwn prin th loypa gia na sugkrinoyme proodo kathe fora kai na stamatame
 
-    int nu=0;
-    for(auto x: owned)
-      if(x.second.first == -1)
-        nu++;
-
-        std::cout << "nu is " << nu << "\n";
     while((num_unassigned > n/10) && (kill_countdown >0) ){ //h anazhthsh range search lsh tha ginetai mexri to 90% twn shmeiwn ginei assign se kapoio kentro. Epeita klassikh methodos opws prota8hke
 
+      num_unassigned_prev = num_unassigned;
       for(unsigned int i=0; i< clusters->size(); i++){ //gia kathe kentro twn clusters
 
         this_center_neighbs.clear();
@@ -146,7 +143,7 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
           //std::cout << this_center_neighbs.size() << " ";
         }
         //pros8hkh shmeiwn se cluster kai flag gia na mhn to paroyn kai ta ypoloipa clusters
-        std::cout << "eimai to cl " << (*clusters)[i].get_center_id() << "kai "<<this_center_neighbs.size() << "\n";
+        //std::cout << "eimai to cl " << (*clusters)[i].get_center_id() << "kai "<<this_center_neighbs.size() << "\n";
         for(unsigned int z=0; z< this_center_neighbs.size(); z++){
           //std::cout << owned[this_center_neighbs[z]].first ;
           //std::cout << this_center_neighbs[z] ;
@@ -170,9 +167,17 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
         } //telos gor gia auta poy brhke auto to cluster gia authn thn aktina
       } //telos for gia ta clusters
 
+      if(num_unassigned_prev - num_unassigned <=0 ) //den kaname proodo, arxise antistrofh metrhsh
+        kill_countdown--;
+      else
+        kill_countdown = 15; //eixame proodo, mhdenise thn antistrofh metrhsh
+
+      if(kill_countdown<=0) //den yphrkse veltiwsh gia sunexomenes loypes, telos
+        break;
+
       radius = radius*2; //diplasiazoume aktina kai sunexizoume
       repetition = true;
-      //std::cout << radius << "\n";
+      //std::cout << num_unassigned << "\n";
     } //telos ths while poy diplasiazoume thn aktina
 
 

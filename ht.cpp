@@ -64,11 +64,11 @@ ht<T>::~ht() {}
 template <class T>
 void ht<T>::hash_vector(my_vector<T> *v)
 {
-    std::cout << "etsi hto o pinax prin hasharw to " << v->get_id_as_int() <<":";
+    /*std::cout << "etsi hto o pinax prin hasharw to " << v->get_id_as_int() <<":";
     for(int i =0; i< table.size(); i++)
       for(int j =0; j< table[i].size(); j++)
         std::cout << table[i][j].first->get_id();
-    std::cout << "\n";
+    std::cout << "\n";*/
 
     long int keyv = my_g.actual_g_function(*v); //ypologise thn timh ths g gia to vector v
     long int modded_keyv = our_mod(keyv, size); //kane thn timh auti mod table size
@@ -90,7 +90,7 @@ std::vector<std::string> ht<T>::hash_query(my_vector<T> *q, double radius, bool 
     this_HT_potential_neighbs.clear();
     for (unsigned int i = 0; i < table[modded_keyv].size(); i++)
     {
-        std::cout << table[modded_keyv][i].second << "\n"; //DEN PAIRNEI TIMES ID KAI VEC SWSTA EDW
+        //std::cout << table[modded_keyv][i].second << "\n"; //DEN PAIRNEI TIMES ID KAI VEC SWSTA EDW
         if(repetition == false){ //prwth fora, tsekare 0 < d <= r
           if( (table[modded_keyv][i].second == keyv) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) <= radius)  )                                    //prepei na exoyn to idio g epishs
             {this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id());  /*std::cout << "mojanga";*/}//valto sth lista pithanwn geitonwn
