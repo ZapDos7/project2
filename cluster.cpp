@@ -179,7 +179,8 @@ int main(int argc, char *argv[])
 
 ///////////////INITIALIZATION 1 - RANDOM////////////////////////////////////////////////////
 
-    cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
+    //cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
+    cluster_centers = initialise_centers_plus<double>(number_of_clusters, &vectors_array);
     initialize_clusters(&cluster_centers, &clusters);
 
     //edw mporeis na tsekareis oti ta kentra einai ok

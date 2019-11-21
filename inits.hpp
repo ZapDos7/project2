@@ -2,6 +2,7 @@
 #include "curve.h"
 #include <set>
 #include <unordered_map>
+#include <algorithm>
 #include "cluster_object.h"
 #include <random>
 #include <cmath>
@@ -49,6 +50,40 @@ std::vector<my_vector<T>> initialise_centers(int clusters, std::unordered_map<st
   return ta_kentra;
 }
 
+//BINARY SEARCH gia to telos ths kmeans++
+std::string binarySearch(std::vector<std::pair<std::string, double>> *arr, int l, int r, double x)
+{
+        int mid = l + (r - l) / 2;
+
+        if((r - l) == 1)//kratame ton aristero se periptwsh poy teleiwsei anamesa se dyo
+          return (*arr)[l].first;
+
+        if((r-mid == 1) && (mid-l==1)){ //ean ta l,mid, r einai diadoxika elegxw autes tis 2 periptwseis
+          if(x > (*arr)[mid].second)
+            return (*arr)[mid].first;
+          else
+            return (*arr)[l].first;
+        }
+
+        if(x > (*arr)[r].second) //oriakh timh ektos pinaka
+          return (*arr)[r].first;
+
+        // If the element belongs to the middle
+        // itself
+        if ((*arr)[mid].second == x)
+            return (*arr)[mid].first;
+
+        // If element is smaller than mid, then
+        // it can only belong to left subarray
+        if ((*arr)[mid].second > x)
+            return binarySearch(arr, l, mid - 1, x);
+
+        // Else the element belongs
+        // in right subarray
+        return binarySearch(arr, mid + 1, r, x);
+
+}
+
 //kmeans++
 template <typename T>
 std::vector<my_vector<T>> initialise_centers_plus(int clusters, std::unordered_map<std::string, my_vector<T>> *vectors_array){
@@ -58,7 +93,7 @@ std::vector<my_vector<T>> initialise_centers_plus(int clusters, std::unordered_m
     keys.push_back(kv.first);
 
   //distance matrix - bazw edw distance otan auti ipologistei
-  std::unordered_map <string ,std::unordered_map<string, double>> Distance_Map;
+  std::unordered_map <std::string ,std::unordered_map<std::string, double>> Distance_Map;
   //double Distance_Matrix[keys.size()][keys.size()]; //all points with all points distances
   for (unsigned int i = 0; i < keys.size(); i++)
   {
@@ -70,22 +105,19 @@ std::vector<my_vector<T>> initialise_centers_plus(int clusters, std::unordered_m
 
   std::vector<std::string> ids_kentrwn; //ta Ids twn kentrwn
   ids_kentrwn.clear();
+  int metrhths = 0;
 
   //to 1o kentro random
   std::random_device rand_dev;
   std::mt19937 generator(rand_dev());
   std::uniform_real_distribution<double>  distr(0, keys.size());
   int rand_id_1 = floor(distr(generator));
-  
+
   std::vector<my_vector<T>> ta_kentra; //pou 8a epistrepsoume
   ta_kentra.clear();
 
-  my_vector<T> one_v_atime;
-  one_v_atime.set_id((*vectors_array)[keys[rand_id_1]].get_id());
-  one_v_atime.set_v((*vectors_array)[keys[rand_id_1]].get_v());
-  ta_kentra.push_back(one_v_atime);
-
-  ids_kentrwn.push_back(one_v_atime.get_id()); //balame to 1o kentro
+  ids_kentrwn.push_back(keys[rand_id_1]); //balame to 1o kentro
+  metrhths++;
 
   //array P
   std::vector<std::pair<std::string, double>> P_array; //auto pou mporei na ginei BST later on
@@ -95,90 +127,87 @@ std::vector<my_vector<T>> initialise_centers_plus(int clusters, std::unordered_m
   apostaseis.clear();
 
   //twra ta upoloipa kentra
-  for (unsigned int j = 0; j < keys.size(); ++) //kathe my_vector
-  {
-    //elegxw an einai kentro idi
-    if (ids_kentrwn.find((*vectors_array)[keys[j]].get_id()) != ids_kentrwn.end()) //uparxei hdh auto to my_v ws kentro
-      continue;
+  while(metrhths < clusters){
 
-    //an den einai kentro:
-    double min1 = std::numeric_limits<double>::max(); //apeiro
-    for (unsigned int i = 0; i < ids_kentrwn.size(); i++) //vres thn apostasi tou j apo kathe kentro i
+    for (unsigned int j = 0; j < keys.size(); j++) //kathe my_vector
     {
-      //elegxw an exw upologisei to dist panw
-      //if ((Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] > 0) && (Distance_Map[(*vectors_array)[keys[j]].get_id()][ids_kentrwn[i]] > 0)) //exei upologistei
-      if (Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] < 0) //den tin exw upologisei
-      {
-        Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] = manhattan_distance((*vectors_array)[ids_kentrwn[i]].get_v(), (*vectors_array)[keys[j]].get_v()); //upologizw to distance auto
-      }   
+      //elegxw an einai kentro idi
+      if (std::find(ids_kentrwn.begin(), ids_kentrwn.end() , (*vectors_array)[keys[j]].get_id()) != ids_kentrwn.end()) //uparxei hdh auto to my_v ws kentro
+        continue;
 
-      if (Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] < min1)
+      //an den einai kentro:
+      double min1 = std::numeric_limits<double>::max(); //apeiro
+      for (unsigned int i = 0; i < ids_kentrwn.size(); i++) //vres thn apostasi tou j apo kathe kentro i
       {
-        min1 = Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()]; //krata tin elaxisti apostasi
+        //elegxw an exw upologisei to dist panw
+        //if ((Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] > 0) && (Distance_Map[(*vectors_array)[keys[j]].get_id()][ids_kentrwn[i]] > 0)) //exei upologistei
+        if (Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] < 0) //den tin exw upologisei
+        {
+          Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] = manhattan_distance((*vectors_array)[ids_kentrwn[i]].get_v(), (*vectors_array)[keys[j]].get_v()); //upologizw to distance auto
+        }
+
+        if (Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()] < min1)
+        {
+          min1 = Distance_Map[ids_kentrwn[i]][(*vectors_array)[keys[j]].get_id()]; //krata tin elaxisti apostasi
+        }
+      } //telos for gia kathe kentro poy exw mexri stigmhs
+      //else einai ypologismeno hdh, pame na kanoume push back:
+      std::pair<std::string, double> temp_pair;
+      temp_pair.first = (*vectors_array)[keys[j]].get_id(); //se poio shmeio anaferomai?
+      temp_pair.second = min1*min1;
+      apostaseis.push_back(min1); //apothikeuw
+      P_array.push_back(temp_pair);
+    } //telos for gia kathe shmeio
+    //find max in apostaseis
+    double max1 = 0.0;
+    for (unsigned int i = 0; i < apostaseis.size(); i++)
+    {
+      if (apostaseis[i] > max1)
+      {
+        max1 = apostaseis[i];
       }
     }
-    //else einai ypologismeno hdh, pame na kanoume push back:
-    std::pair<std::string, double> temp_pair;
-    temp_pair.first = (*vectors_array)[keys[j]].get_id(); //se poio shmeio anaferomai?
-    temp_pair.second = min1*min1;
-    apostaseis.push_back(min1); //apothikeuw
-    P_array.push_back(temp_pair);
-  }
-  //find max in apostaseis
-  double max1 = 0.0;
-  for (unsigned int i = 0; i < apostaseis.size(); i++)
-  {
-    if (apostaseis[i] > max1)
-    {
-      max1 = apostaseis[i];
-    }
-  }
-    
-  //divide all pair.second me autin tin timi
-  for (unsigned int i = 0; i < P_array.size(); i++)
-  {
-    P_array[i].second = P_array[i].second/max1; //normalized
-  }
 
-  for (unsigned int i = 0; i < P_array.size(); i++)
-  {
-    double sum = 0.0;
-    for (unsigned int j = 0; j < i; j++)
+    //divide all pair.second me autin tin timi
+    for (unsigned int i = 0; i < P_array.size(); i++)
     {
-      sum += P_array[j];
+      P_array[i].second = P_array[i].second/max1; //normalized
     }
-    P_array[i].second += sum;
-  }
-  //bres random x (float) anamesa sto 0 kai to P_array[last].second
-  double megisto = P_array[P_array.size()-1].second; //last value is tops
-  std::uniform_real_distribution<double>  distr2(0, megisto);
-  double x = distr2(generator);
-  //auto to x einai anamesa se alles 2 times P_array[i].second kai P_array[i+1].second
-  //binary search - P_array is already sorted! :D
-  int z = P_array.size()/2;
-  while (z > 0)
-  {
-    if (P_array[z].second > x)
-    {
-      /* code */
-    }
-    else if (P_array[z].second < x)
-    {
 
-    }
-    else // iso
+    for (unsigned int i = 0; i < P_array.size(); i++)
     {
-
+      double sum = 0.0;
+      for (unsigned int j = 0; j < i; j++)
+      {
+        sum += P_array[j].second;
+      }
+      P_array[i].second += sum;
     }
-    z /= 2;
+    //bres random x (float) anamesa sto 0 kai to P_array[last].second
+    double megisto = P_array[P_array.size()-1].second; //last value is tops
+    std::uniform_real_distribution<double>  distr2(0, megisto);
+    double x = distr2(generator);
+    //auto to x einai anamesa se alles 2 times P_array[i].second kai P_array[i+1].second
+    //binary search - P_array is already sorted! :D
+    std::string to_become_center;
+    to_become_center = binarySearch(&P_array, 0, P_array.size()-1, x);
+    ids_kentrwn.push_back(to_become_center);
+    metrhths++;
+    //push back to x sta kentra kai ksanamana
+  }; //telos megalhs while poy dhmiourgei 1 kentro th fora
+
+  for(unsigned int i = 0; i < ids_kentrwn.size(); i++){
+    my_vector<T> one_v_atime;
+    one_v_atime.set_id((*vectors_array)[ids_kentrwn[i]].get_id());
+    one_v_atime.set_v((*vectors_array)[ids_kentrwn[i]].get_v());
+    ta_kentra.push_back(one_v_atime);
   }
-  
-  //ara to neo kentro einai P_array[i+1].first //afou ta slides lene <, <=
-  //push back to x sta kentra kai ksanamana
-}
+  return ta_kentra;
+
+}//telos sunarthshs
 
 
-//init custers based on kentra pou brethikan parapanw 
+//init custers based on kentra pou brethikan parapanw
 template <typename T>
 void initialize_clusters (std::vector<my_vector<T>> *cluster_centers, std::vector<cluster<T>> *clusters) {
   for(unsigned int i=0; i<(*cluster_centers).size(); i++){
