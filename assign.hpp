@@ -186,6 +186,7 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
       if(x.second.first == -1){ //akaparwto
         double min1 = std::numeric_limits<double>::max(); //apeiro
         int min_clust_index = -1; //to index tou cluster opou anoikei kathe x
+        //(*vectors_array)[x.first].get_id()
         for (unsigned int j = 0; j < (*clusters).size(); j++)
         {
             double tmp = 0.0;
