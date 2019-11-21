@@ -113,45 +113,69 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
       for (int j = 0; j < number_of_vector_hash_tables; j++)
         our_hash_tables[j].hash_vector(&(x.second));
 
-      owned[x.first].first = -1;
+      std::pair<int, double> index_and_radius;
+      index_and_radius.first = -1;
+      index_and_radius.second = 0.0;
+      owned[x.first] = index_and_radius;
       n++;
     }
 
-    int num_remaining = n; //posa exoun meinei xwris anathesh
+    int num_unassigned = n; //posa exoun meinei xwris anathesh
     double radius = initialize_radius(clusters);
     std::vector<std::string> this_center_neighbs;
     std::vector<std::string> this_HT_neighbs;
-    for(unsigned int i=0; i< clusters->size(); i++){
+    bool repetition = false;
+    int kill_countdown = 15; //an den exoun ginei nees anatheseis meta apo tosous diplasiasmous aktinas, stop
 
-      this_center_neighbs.clear();
-      for (int j = 0; j < number_of_vector_hash_tables; j++){
-        this_HT_neighbs.clear();
-        this_HT_neighbs = our_hash_tables[j].hash_query((*clusters)[i].get_center_ptr(), radius, false);
-        this_center_neighbs.insert(this_center_neighbs.end(), this_HT_neighbs.begin(), this_HT_neighbs.end());
-      }
-      //pros8hkh shmeiwn se cluster kai flag gia na mhn to paroyn kai ta ypoloipa clusters
-      for(unsigned int z=0; z< this_center_neighbs.size(); z++){
-        if( owned[this_center_neighbs[z]].first == -1 ){ //den exei kaparw8ei
-            (*clusters)[i].incorporate_point(&((*vectors_array)[this_center_neighbs[z]]));
-            owned[this_center_neighbs[z]].first = i; //to kaparwse
-            owned[this_center_neighbs[z]].second = radius; //to kaparwse entos aktinas toshs
-            n--;
+    int nu=0;
+    for(auto x: owned)
+      if(x.second.first == -1)
+        nu++;
+
+        std::cout << "nu is " << nu << "\n";
+    while((num_unassigned > n/10) && (kill_countdown >0) ){ //h anazhthsh range search lsh tha ginetai mexri to 90% twn shmeiwn ginei assign se kapoio kentro. Epeita klassikh methodos opws prota8hke
+
+      for(unsigned int i=0; i< clusters->size(); i++){ //gia kathe kentro twn clusters
+
+        this_center_neighbs.clear();
+        for (int j = 0; j < number_of_vector_hash_tables; j++){ //LSH se L hashtables
+          this_HT_neighbs.clear();
+          this_HT_neighbs = our_hash_tables[j].hash_query((*clusters)[i].get_center_ptr(), radius, repetition);
+          //std::cout << this_HT_neighbs.size() << "-";
+          this_center_neighbs.insert(this_center_neighbs.end(), this_HT_neighbs.begin(), this_HT_neighbs.end());
+          //std::cout << this_center_neighbs.size() << " ";
         }
-        else{ //sugkrinoume me auton poy to exei kaparwsei
-          if(owned[this_center_neighbs[z]].second >= radius){ //an kapoios allos to exei kaparwsei me mikroterh aktina, apofeugoume th sugkrish kai proxwrame
-            if(manhattan_distance((*vectors_array)[this_center_neighbs[z]].get_v() , (*clusters)[i].get_center_coords()) < manhattan_distance((*vectors_array)[this_center_neighbs[z]].get_v() , (*clusters)[owned[this_center_neighbs[z]].first].get_center_coords()) ){
-              (*clusters)[owned[this_center_neighbs[z]].first].discorporate_point(&((*vectors_array)[this_center_neighbs[z]])); //to bgazei ap to palio
-              (*clusters)[i].incorporate_point(&((*vectors_array)[this_center_neighbs[z]])); //to vazei sto neo
+        //pros8hkh shmeiwn se cluster kai flag gia na mhn to paroyn kai ta ypoloipa clusters
+        std::cout << "eimai to cl " << (*clusters)[i].get_center_id() << "kai "<<this_center_neighbs.size() << "\n";
+        for(unsigned int z=0; z< this_center_neighbs.size(); z++){
+          //std::cout << owned[this_center_neighbs[z]].first ;
+          //std::cout << this_center_neighbs[z] ;
+          if( owned[this_center_neighbs[z]].first == -1 ){ //den exei kaparw8ei
+              //std::cout << "kapakap ";
+              (*clusters)[i].incorporate_point(&((*vectors_array)[this_center_neighbs[z]]));
               owned[this_center_neighbs[z]].first = i; //to kaparwse
               owned[this_center_neighbs[z]].second = radius; //to kaparwse entos aktinas toshs
-            }
+              num_unassigned--;
           }
-        }
+          else{ //sugkrinoume me auton poy to exei kaparwsei
+            if(owned[this_center_neighbs[z]].second >= radius){ //an kapoios allos to exei kaparwsei me mikroterh aktina, apofeugoume th sugkrish kai proxwrame
+              if(manhattan_distance((*vectors_array)[this_center_neighbs[z]].get_v() , (*clusters)[i].get_center_coords()) < manhattan_distance((*vectors_array)[this_center_neighbs[z]].get_v() , (*clusters)[owned[this_center_neighbs[z]].first].get_center_coords()) ){
+                (*clusters)[owned[this_center_neighbs[z]].first].discorporate_point(&((*vectors_array)[this_center_neighbs[z]])); //to bgazei ap to palio
+                (*clusters)[i].incorporate_point(&((*vectors_array)[this_center_neighbs[z]])); //to vazei sto neo
+                owned[this_center_neighbs[z]].first = i; //to kaparwse
+                owned[this_center_neighbs[z]].second = radius; //to kaparwse entos aktinas toshs
+              } //telos if gia sugkrish apostasewn
+            } //telos if poy afora an ena kaparwmeno shmeio exei kaparw8ei apo mikroterh aktina ara den exei nohma na koitaksoume pali
+          } //telos else poy afora to an ena shmeio einai kaparwmeno h oxi
+        } //telos gor gia auta poy brhke auto to cluster gia authn thn aktina
+      } //telos for gia ta clusters
 
-      }
+      radius = radius*2; //diplasiazoume aktina kai sunexizoume
+      repetition = true;
+      //std::cout << radius << "\n";
+    } //telos ths while poy diplasiazoume thn aktina
 
 
-    }
     //twra an kapoio exei meinei akaparwto, prepei na paei sto kontinotero tou kentro
     for(auto x: owned){
       if(x.second.first == -1){ //akaparwto

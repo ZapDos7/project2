@@ -64,11 +64,11 @@ ht<T>::~ht() {}
 template <class T>
 void ht<T>::hash_vector(my_vector<T> *v)
 {
-    /*std::cout << "etsi hto o pinax prin hasharw to " << v->get_id_as_int() <<":";
+    std::cout << "etsi hto o pinax prin hasharw to " << v->get_id_as_int() <<":";
     for(int i =0; i< table.size(); i++)
       for(int j =0; j< table[i].size(); j++)
-        std::cout << table[i][j].first->get_id_as_int();
-    std::cout << "\n";*/
+        std::cout << table[i][j].first->get_id();
+    std::cout << "\n";
 
     long int keyv = my_g.actual_g_function(*v); //ypologise thn timh ths g gia to vector v
     long int modded_keyv = our_mod(keyv, size); //kane thn timh auti mod table size
@@ -78,7 +78,7 @@ void ht<T>::hash_vector(my_vector<T> *v)
     thepair.second = keyv;
     //table[modded_keyv] = tmp_ht_cell; //vale auto to ht_cell sto katallilo bucket tou table
     table[modded_keyv].push_back(thepair);
-    //std::cout << "my id is " << thepair.first->get_id_as_int() << "\n";
+    //std::cout << "my id is " << thepair.first->get_id() << "\n";
 }
 
 template <class T>
@@ -90,14 +90,14 @@ std::vector<std::string> ht<T>::hash_query(my_vector<T> *q, double radius, bool 
     this_HT_potential_neighbs.clear();
     for (unsigned int i = 0; i < table[modded_keyv].size(); i++)
     {
-        //std::cout << table[modded_keyv][i].first->get_id_as_int() << "\n";
+        std::cout << table[modded_keyv][i].second << "\n"; //DEN PAIRNEI TIMES ID KAI VEC SWSTA EDW
         if(repetition == false){ //prwth fora, tsekare 0 < d <= r
           if( (table[modded_keyv][i].second == keyv) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) <= radius)  )                                    //prepei na exoyn to idio g epishs
-              this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id()); //valto sth lista pithanwn geitonwn
+            {this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id());  /*std::cout << "mojanga";*/}//valto sth lista pithanwn geitonwn
         }
         else{ //kanoyme epanalhpsh, ara koita apo r_prev kai meta
           if( (table[modded_keyv][i].second == keyv) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) <= radius) && (manhattan_distance(table[modded_keyv][i].first->get_v(), q->get_v() ) > radius/2)  )                                    //prepei na exoyn to idio g epishs
-              this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id()); //valto sth lista pithanwn geitonwn
+            {this_HT_potential_neighbs.push_back(table[modded_keyv][i].first->get_id()); /*std::cout << "mojanga";*/} //valto sth lista pithanwn geitonwn
         }
 
         //std::cout << "my id is " << table[modded_keyv][i].first->get_id_as_int() << "\n";
