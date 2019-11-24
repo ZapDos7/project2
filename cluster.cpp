@@ -200,14 +200,19 @@ int main(int argc, char *argv[])
 
 ///////////////////ASSIGNMENT 1- LLOYD'S //////////////////////////////////////////////////
 
-  /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
-  //lloyd_ass(&clusters, &vectors_array);
-  LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
+    /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
+    //lloyd_ass(&clusters, &vectors_array);
+    LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
+    for(unsigned int i = 0; i < clusters.size(); i++){
+      clusters[i].print_cluster();
+    }
 
-
-  update_mean(&clusters, diastaseis_vecs);
-
-
+    //update_mean(&clusters, diastaseis_vecs);
+    update_pam(&clusters);
+    LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
+    for(unsigned int i = 0; i < clusters.size(); i++){
+      clusters[i].print_cluster();
+    }
 
   }
   else if(what_is_the_input == "curves"){
