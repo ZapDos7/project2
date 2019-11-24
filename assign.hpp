@@ -88,7 +88,7 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
       tmp += input_actual_NNs.at(i).get_distance();
     }
     //int diastaseis = vectors_array->begin().second.get_v().size(); //gia hash tables
-    std::cout << "diasteaseis " << diastaseis << "\n";
+    //std::cout << "diasteaseis " << diastaseis << "\n";
     int Table_Size = (*vectors_array).size() / 8;
     mean_distance = tmp / input_actual_NNs.size(); //fp division
     //auto end_of_w_calc = std::chrono::high_resolution_clock::now() - start_of_w_calc;

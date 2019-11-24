@@ -67,6 +67,21 @@ my_vector<T> * cluster<T>::get_center_ptr()
     return &center;
 }
 
+template <class T>
+void cluster<T>::print_cluster()
+{
+    //std::cout << x.first << x.second.get_id() << "\n";
+    std::cout << "Eimai to cluster " << get_center_id() << "\n";
+    for (auto x : set_of_points)
+    {
+      std::cout << x.second->get_id() << " ";
+    }
+    std::cout << std::endl;
+
+
+}
+
+
 template class cluster<float>;
 template class cluster<int>;
 template class cluster<double>;

@@ -18,7 +18,7 @@
 #include "ht.h" //gia range search lsh
 #include <chrono> // time measurements
 #include <time.h>
-
+#include "update.hpp"
 #include "inits.hpp"
 #include "assign.hpp"
 
@@ -174,27 +174,18 @@ int main(int argc, char *argv[])
     }
     std::cout << jujuju;*/
 
-    std::vector<my_vector<double>> cluster_centers; //ta arxika kentra twn clusters mas
     std::vector<cluster<double>> clusters; //ta arxika mas clusters
 
 ///////////////INITIALIZATION 1 - RANDOM////////////////////////////////////////////////////
 
     //cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
-    cluster_centers = initialise_centers_plus<double>(number_of_clusters, &vectors_array);
-    initialize_clusters(&cluster_centers, &clusters);
+    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    //format_clusters(&cluster_centers, &clusters);
 
-    //edw mporeis na tsekareis oti ta kentra einai ok
-    /*for (unsigned int i = 0; i < cluster_centers.size(); i++)
-    {
-      std::cout << "Eimai to kentro " << cluster_centers[i].get_id() << "\n";
-      std::vector<double> temp = cluster_centers[i].get_v();
-      for (unsigned int j = 0; j < temp.size(); j++)
-      {
-        std::cout << temp[j] << " ";
-      }
-      std::cout << "\n";
-    }*/
-    //otan teleiwsei auto to init, cluster_centers.clear() kai meta kanoume to epomeno init!
+    //edw mporeis na tsekareis ta kentra oti einai ok
+    //for(unsigned int i = 0; i < clusters.size(); i++){
+      //clusters[i].print_cluster();
+    //}
 
     //checkarw oti ta clusters einai ok
     /*for (unsigned int i = 0; i < clusters.size(); i++)
@@ -212,16 +203,10 @@ int main(int argc, char *argv[])
   /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
   //lloyd_ass(&clusters, &vectors_array);
   LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
-  for(unsigned int i = 0; i < clusters.size(); i++){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
-    //std::cout << x.first << x.second.get_id() << "\n";
-    std::unordered_map<std::string, my_vector<double> * > * mpla = clusters[i].get_set_of_points();
-    std::cout << "Eimai to cluster " << clusters[i].get_center_id() << "\n";
-    for (auto x :(*mpla))
-    {
-      std::cout << x.second->get_id() << " ";
-    }
-    std::cout << std::endl;
-  }
+
+
+  update_mean(&clusters, diastaseis_vecs);
+
 
 
   }

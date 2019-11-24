@@ -10,6 +10,8 @@
 #include <sstream>
 #include <cmath> //abs with overload for float
 #include <limits>
+#include "cluster_object.h"
+#include "my_vector.h"
 /*#include "curve_point.h"
 #include "curve.h"
 #include "traversal.h"*/
@@ -114,5 +116,17 @@ double dtw(curve<T> *c1, curve<T> *c2){
   return dist_mat[c1->get_size()][c2->get_size()];
 
 }*/
+
+
+//format clusters based on kentra pou brethikan parapanw
+template <typename T>
+void format_clusters (std::vector<my_vector<T>> *cluster_centers, std::vector<cluster<T>> *clusters) {
+  (*clusters).clear();
+  for(unsigned int i=0; i<(*cluster_centers).size(); i++){
+      cluster<T> onecatatime(&((*cluster_centers)[i]));
+      (*clusters).push_back(onecatatime);
+    }
+}
+
 
 #endif

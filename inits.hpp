@@ -9,7 +9,7 @@
 
 //random init
 template <typename T>
-std::vector<my_vector<T>> initialise_centers(int clusters, std::unordered_map<std::string, my_vector<T>> *vectors_array) {
+void initialise_centers(int clusters, std::unordered_map<std::string, my_vector<T>> *vectors_array, std::vector<cluster<T>> * clusts) {
   //srand(time(NULL));
   std::set<int> ids; //indexes ston pinaka cluster
   //logw anwmalias do8entwn input files, prepei na kanoyme workaround auto to problhma...
@@ -47,7 +47,8 @@ std::vector<my_vector<T>> initialise_centers(int clusters, std::unordered_map<st
     std::cerr << "Error in initialise_centers.\n";
     exit(-2);
   }
-  return ta_kentra;
+  format_clusters(&ta_kentra, clusts);
+  //return ta_kentra;
 }
 
 //BINARY SEARCH gia to telos ths kmeans++
@@ -86,7 +87,7 @@ std::string binarySearch(std::vector<std::pair<std::string, double>> *arr, int l
 
 //kmeans++
 template <typename T>
-std::vector<my_vector<T>> initialise_centers_plus(int clusters, std::unordered_map<std::string, my_vector<T>> *vectors_array){
+void initialise_centers_plus(int clusters, std::unordered_map<std::string, my_vector<T>> *vectors_array, std::vector<cluster<T>> * clusts){
   //logw anwmalias do8entwn input files, prepei na kanoyme workaround auto to problhma...
   std::vector<std::string> keys; //ta ids
   for(auto kv : *vectors_array)
@@ -202,16 +203,7 @@ std::vector<my_vector<T>> initialise_centers_plus(int clusters, std::unordered_m
     one_v_atime.set_v((*vectors_array)[ids_kentrwn[i]].get_v());
     ta_kentra.push_back(one_v_atime);
   }
-  return ta_kentra;
+  format_clusters(&ta_kentra, clusts);
+  //return ta_kentra;
 
 }//telos sunarthshs
-
-
-//init custers based on kentra pou brethikan parapanw
-template <typename T>
-void initialize_clusters (std::vector<my_vector<T>> *cluster_centers, std::vector<cluster<T>> *clusters) {
-  for(unsigned int i=0; i<(*cluster_centers).size(); i++){
-      cluster<T> onecatatime(&((*cluster_centers)[i]));
-      (*clusters).push_back(onecatatime);
-    }
-}
