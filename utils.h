@@ -128,5 +128,14 @@ void format_clusters (std::vector<my_vector<T>> *cluster_centers, std::vector<cl
     }
 }
 
+template <typename T>
+void format_curve_clusters (std::vector<curve<T>> *cluster_centers, std::vector<curve_cluster<T>> *clusters) {
+  (*clusters).clear();
+  for(unsigned int i=0; i<(*cluster_centers).size(); i++){
+      curve_cluster<T> onecatatime(&((*cluster_centers)[i]));
+      (*clusters).push_back(onecatatime);
+    }
+}
+
 
 #endif
