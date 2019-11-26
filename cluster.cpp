@@ -125,19 +125,22 @@ int main(int argc, char *argv[])
   int diastaseis_vecs; //self explanatory
   std::ifstream infile(dataset_path); //dataset: me tabs anamesa, ka8e grammi: id1    x11     x12     x13...
   std::string line;
+  bool datatype_set = false;
   //std::vector<my_vector<double>> vectors_array; //pinakas gia vectors
   std::unordered_map<std::string, my_vector<double> > vectors_array; //key == id tou vector, mapped value == my_vectors. Ta ids einai o,ti nai nai g auto....
   std::vector<curve<double>> curves_array; //pinakas gia kampyles
   while (std::getline(infile, line))
   { //read files
-    if(line == "vectors"){
+    if((datatype_set == false)&&(line.find("vectors") != std::string::npos)){
       what_is_the_input = "vectors";
+      datatype_set = true;
       continue;
     }
 
-    if(line == "curves"){
-      std::cout << "yaaaaaaaaaaaz";
+    //std::cout << line << "\n";
+    if((datatype_set == false)&&(line.find("curves") != std::string::npos)){
       what_is_the_input = "curves";
+      datatype_set = true;
       continue;
     }
 
