@@ -217,6 +217,9 @@ int main(int argc, char *argv[])
   }
   else if(what_is_the_input == "curves"){ //an mas do8oun kampyles
     std::vector<curve_cluster<double>> clusters; //ta arxika mas clusters
+    std::pair<double, double> twoelems = calculate_delta(&curves_array);
+    double delta = twoelems.second;
+    double max_coord_lsh = twoelems.first;
     //initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
     for(unsigned int i = 0; i < clusters.size(); i++){

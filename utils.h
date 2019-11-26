@@ -137,4 +137,61 @@ void format_curve_clusters (std::vector<curve<T>> *cluster_centers, std::vector<
 }
 
 
+//shmantiko gia lsh kampylwn
+template <typename T>
+std::pair<double, T> calculate_delta(std::unordered_map<std::string, curve<T> > *kurv_array){
+	std::vector<curve<T>> curves_array;
+	for(auto x:*kurv_array){
+		curves_array.push_back(x.second);
+	}
+
+	double delta = 0.0;                                        //mesi apostasi shmeiwn kampulws
+    double inf = std::numeric_limits<double>::max();           //apeiro kai kala
+    double max_coord = -1 * inf;                               //arxika -apeiro
+    ;                                                          //h megisti metabliti pou uparxei sto dataset
+    for (unsigned int i = 0; i < curves_array.size(); i++) //an theloume ola & query, sbhnoume to "-q" kai ola popa
+    {
+      double tmp = 0.0;
+      double plithos_athroismatwn = 0.0;
+      std::vector<curve_point<T>> shmeia = curves_array[i].get_points(); //pairnw to vector apo shmeia kathe kampulhs
+      if (shmeia.size() < 2)
+      {
+        if (shmeia[i].get_x() > max_coord)
+        {
+          max_coord = shmeia[i].get_x();
+        }
+        if (shmeia[i].get_y() > max_coord)
+        {
+          max_coord = shmeia[i].get_y();
+        }
+        continue;
+      }
+      else
+      {
+        if (shmeia[i].get_x() > max_coord)
+        {
+          max_coord = shmeia[i].get_x();
+        }
+        if (shmeia[i].get_y() > max_coord)
+        {
+          max_coord = shmeia[i].get_y();
+        }
+        for (unsigned int j = 0; j < shmeia.size() - 1; j++) //pairnw kathe shmeio tou vector ^
+        {
+          tmp += true_euclidean<double>(shmeia[j], shmeia[j + 1]);
+          plithos_athroismatwn += 1.0;
+        }
+        tmp = tmp / plithos_athroismatwn;
+        delta += tmp;
+        //std::cerr << "Tmp delta is " << delta << '\n';
+      }
+    }
+    delta = delta / (double)(curves_array.size()); //ki edw sbhnw to "-q" an eimai stin periptosi pou thelw kai ta query
+		std::pair<double, T> twoelems;
+		twoelems.first = delta;
+		twoelems.second = max_coord;
+		return twoelems;
+}
+
+
 #endif
