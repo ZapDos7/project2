@@ -81,7 +81,72 @@ void cluster<T>::print_cluster()
 
 }
 
+//SUNARTHSEIS CURVE_CLUSTER
+
+template <class T>
+curve_cluster<T>::~curve_cluster() {}
+
+
+template <class T>
+curve_cluster<T>::curve_cluster(curve<T> * c){
+  set_of_curves.clear();
+  set_center(c);
+}
+
+
+template <class T>
+void curve_cluster<T>::set_center(curve<T> * c) //vasei enos deikth se my_vector
+{
+    center.set_id(c->get_id()); //to kanei idio
+    center.set_points(c->get_points()); //ana8etei ton vector apo ta shmeia ths kampylhs
+}
+
+
+template <class T>
+std::string curve_cluster<T>::get_center_id()
+{
+    return center.get_id();
+}
+
+
+template <class T>
+std::vector<curve_point<T>> curve_cluster<T>::get_center_points()
+{
+    return center.get_points();
+}
+
+
+template <class T>
+void curve_cluster<T>::incorporate_point(curve<T> *  p) //vasei enos deikth se my_vector
+{
+    set_of_curves[p->get_id()] = p; //ana8esh timhs tou deikth sth swsth 8esh
+}
+
+
+template <class T>
+void curve_cluster<T>::discorporate_point(curve<T> *  p) //vasei enos deikth se my_vector
+{
+    set_of_curves.erase(p->get_id());  //diagrafei entelws to sugkekrimeno entry apo to cluster
+}
+
+
+template <class T>
+std::unordered_map<std::string, curve<T> * > * curve_cluster<T>::get_set_of_curves()
+{
+    return &set_of_curves;
+}
+
+template <class T>
+curve<T> * curve_cluster<T>::get_center_ptr()
+{
+    return &center;
+}
+
+
 
 template class cluster<float>;
 template class cluster<int>;
 template class cluster<double>;
+template class curve_cluster<float>;
+template class curve_cluster<int>;
+template class curve_cluster<double>;

@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
     }
 
     if(line == "curves"){
+      std::cout << "yaaaaaaaaaaaz";
       what_is_the_input = "curves";
       continue;
     }
@@ -215,7 +216,8 @@ int main(int argc, char *argv[])
     }
 
   }
-  else if(what_is_the_input == "curves"){
+  else if(what_is_the_input == "curves"){ //an mas do8oun kampyles
+    std::vector<curve_cluster<double>> clusters; //ta arxika mas clusters
 
   }
   else{
