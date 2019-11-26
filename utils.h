@@ -12,9 +12,8 @@
 #include <limits>
 #include "cluster_object.h"
 #include "my_vector.h"
-/*#include "curve_point.h"
+#include "curve_point.h"
 #include "curve.h"
-#include "traversal.h"*/
 
 /*Manhattan Distance*/
 template <typename T>
@@ -60,7 +59,7 @@ double manhattan_distance(std::vector<T> v1, std::vector<T> v2)
 
 /*Functions for DTW*/
 
-/*template <typename T>
+template <typename T>
 double true_euclidean(curve_point<T> cp1, curve_point<T> cp2)
 {
   T x1 = cp1.get_x();
@@ -115,7 +114,7 @@ double dtw(curve<T> *c1, curve<T> *c2){
   }
   return dist_mat[c1->get_size()][c2->get_size()];
 
-}*/
+}
 
 
 //format clusters based on kentra pou brethikan parapanw

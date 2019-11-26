@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
   bool datatype_set = false;
   //std::vector<my_vector<double>> vectors_array; //pinakas gia vectors
   std::unordered_map<std::string, my_vector<double> > vectors_array; //key == id tou vector, mapped value == my_vectors. Ta ids einai o,ti nai nai g auto....
-  std::vector<curve<double>> curves_array; //pinakas gia kampyles
+  std::unordered_map<std::string, curve<double> > curves_array; //pinakas gia kampyles
   while (std::getline(infile, line))
   { //read files
     if((datatype_set == false)&&(line.find("vectors") != std::string::npos)){
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     if(what_is_the_input == "curves"){ // exoume na kanoyme me vectors
       curve<double> one_v_atime(line);
       //std::cout << one_v_atime.get_id()  <<"\n" ;
-      curves_array.push_back(one_v_atime);
+      curves_array[one_v_atime.get_id()] = one_v_atime;
       n++;
     }
 
@@ -180,8 +180,6 @@ int main(int argc, char *argv[])
 
     std::vector<cluster<double>> clusters; //ta arxika mas clusters
 
-///////////////INITIALIZATION 1 - RANDOM////////////////////////////////////////////////////
-
     //cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
     //format_clusters(&cluster_centers, &clusters);
@@ -202,8 +200,6 @@ int main(int argc, char *argv[])
       std::cout << std::endl;
     }*/
 
-///////////////////ASSIGNMENT 1- LLOYD'S //////////////////////////////////////////////////
-
     /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
     //lloyd_ass(&clusters, &vectors_array);
     LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
@@ -221,7 +217,11 @@ int main(int argc, char *argv[])
   }
   else if(what_is_the_input == "curves"){ //an mas do8oun kampyles
     std::vector<curve_cluster<double>> clusters; //ta arxika mas clusters
-
+    //initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
+    initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
+    for(unsigned int i = 0; i < clusters.size(); i++){
+      clusters[i].print_cluster();
+    }
   }
   else{
     std::cout << "Den orises ti typou dedomena exoyme sthn prwth grammh opws eipe h ekfnwhsh, Enjoy the exit :* xoxo\n";
