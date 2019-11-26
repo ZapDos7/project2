@@ -65,3 +65,40 @@ void update_mean(std::vector<cluster<T>> * clusts, int diastaseis){
   format_clusters(&nea_kentra, clusts);
   //return nea_kentra;
 }//telos sunarthshs
+
+
+
+////////////////CURVES/////////////////
+template <typename T>
+void update_pam_curve(std::vector<curve_cluster<T>> * clusts){
+  std::vector<curve<T>> nea_kentra;
+  for(unsigned int i=0; i< (*clusts).size(); i++){ //gia ka8e cluster
+    double min1 = std::numeric_limits<double>::max(); //min pairnei timh apeiro
+    curve<T> min_dist_point;
+    std::unordered_map<std::string, curve<T> * > * clust_points = (*clusts)[i].get_set_of_curves(); //ta stoixeia tou cluster
+    for(auto x:*clust_points) { //gia kathe stoixeio tou cluster
+      double mesi_apostasi = 0.0;
+      //sugkrine gia kathe shmeio != kentro
+      if (x.first == (*clusts)[i].get_center_id())
+        continue; //den psaxnw to idi kentro
+      //else
+      for(auto y:*clust_points) { //gia kathe stoixeio tou cluster
+        //skip myself
+        if (y.first == x.first)
+          continue;
+        //bres mean tou dist apo ta alla shmeia
+        mesi_apostasi += dtw(x.second, y.second);
+      } //telos loop twn y
+      mesi_apostasi /= (clust_points->size()-1);
+      if (mesi_apostasi < min1)//min (mean(dist)) => new kentro
+      {
+        min1 = mesi_apostasi;
+        min_dist_point.set_id(x.second->get_id());
+        min_dist_point.set_points(x.second->get_points());
+      }
+    } //telos loop twn x
+    //push back to neo kentro
+    nea_kentra.push_back(min_dist_point);
+  } //telos loop twn clusters
+  format_curve_clusters(&nea_kentra, clusts);
+} //telos sunartisis
