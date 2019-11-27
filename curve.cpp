@@ -83,7 +83,7 @@ curve<T>::curve(string inp)
       std:: cout << "eimai h" << id << my_points[i].get_x() << "," << my_points[i].get_y() << "\n";
 
     }*/
-    
+
 }
 
 template <class T>
@@ -108,7 +108,9 @@ curve<T>::~curve<T>() {}
 template <class T>
 unsigned int curve<T>::get_size()
 {
-    return num_of_points;
+    //return num_of_points;
+    return my_points.size();
+
 }
 
 template <class T>

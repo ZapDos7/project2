@@ -66,7 +66,6 @@ double initialize_radius_curve(std::vector<curve_cluster<T>>* clusters)
       if((*clusters)[i].get_center_id() == (*clusters)[j].get_center_id()) //einai to idio kentro
         continue;
 
-        std::cout << (*clusters)[i].get_center_ptr()->get_size() <<"mphkaaa\n";
       double apostasi= dtw((*clusters)[i].get_center_ptr(), (*clusters)[j].get_center_ptr());
       if( apostasi < init_radius)
           init_radius = apostasi ;
@@ -397,9 +396,9 @@ void LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered
           converted_center = vectorify(grid_center);
           add_pad(&converted_center, 100 * max_coord, max_dims_in);
           this_HT_neighbs = grids_v[j].hash_table.hash_query(&converted_center,(*clusters)[i].get_center_ptr(), radius, repetition);
-          std::cout << this_HT_neighbs.size() << "-";
+          //std::cout << this_HT_neighbs.size() << "-";
           this_center_neighbs.insert(this_center_neighbs.end(), this_HT_neighbs.begin(), this_HT_neighbs.end());
-          std::cout << this_center_neighbs.size() << " ";
+          //std::cout << this_center_neighbs.size() << " ";
         }
         //pros8hkh shmeiwn se cluster kai flag gia na mhn to paroyn kai ta ypoloipa clusters
         //std::cout << "eimai to cl " << (*clusters)[i].get_center_id() << "kai "<<this_center_neighbs.size() << "\n";
