@@ -44,6 +44,7 @@ public:
   std::string get_center_id();
   std::vector<curve_point<T>> get_center_points(); //epistrefei ta shmeia poy apoteloyn thn kampylh-kentro
   curve<T> * get_center_ptr();
+  curve<T> get_center();
   void incorporate_point(curve<T> * p); //enswmatwnei ena shmeio sto cluster
   void discorporate_point(curve<T> * p); //apoxwrizetai ena shmeio
   std::unordered_map<std::string, curve<T> * > *get_set_of_curves();

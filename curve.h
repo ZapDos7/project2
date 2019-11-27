@@ -10,6 +10,7 @@
 #include <cstddef>       // std::size_t
 #include <iostream>
 #include <typeinfo>
+#include <cstring>
 
 //oi kampules
 template <class T>

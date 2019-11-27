@@ -30,11 +30,7 @@ curve<T>::curve(string inp)
     {
         coords.push_back(intermediate2); //coords[i] = "(x0," (i artio) & coords[j] = "y0)" (j peritto)
     }
-    /*for (unsigned int i = 0; i < coords.size(); i++)
-    {
-        cout << "Coords i is" << coords[i] << '\n'
-             << '\n';
-    }*/
+
     for (unsigned int i = 0; i < coords.size(); i += 2)
     {
         stringstream tool_x(coords[i]);
@@ -83,7 +79,13 @@ curve<T>::curve(string inp)
         //pair
         my_points.push_back(temp);
     }
+    /*for(int i =0; i< my_points.size(); i++){
+      std:: cout << "eimai h" << id << my_points[i].get_x() << "," << my_points[i].get_y() << "\n";
+
+    }*/
+    
 }
+
 template <class T>
 curve<T>::curve(vector<curve_point<T>> cps, int pointsnum, string idd)
 {

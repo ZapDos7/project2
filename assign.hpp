@@ -66,8 +66,10 @@ double initialize_radius_curve(std::vector<curve_cluster<T>>* clusters)
       if((*clusters)[i].get_center_id() == (*clusters)[j].get_center_id()) //einai to idio kentro
         continue;
 
-      if( dtw((*clusters)[i].get_center_ptr(), (*clusters)[j].get_center_ptr()) < init_radius)
-          init_radius = dtw((*clusters)[i].get_center_ptr(), (*clusters)[j].get_center_ptr()) ;
+        std::cout << (*clusters)[i].get_center_ptr()->get_size() <<"mphkaaa\n";
+      double apostasi= dtw((*clusters)[i].get_center_ptr(), (*clusters)[j].get_center_ptr());
+      if( apostasi < init_radius)
+          init_radius = apostasi ;
 
     }
   }
@@ -356,6 +358,7 @@ void LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered
         add_pad(&input_vectors_array[i], 100 * max_coord, max_dims_in);
       }
 
+
       for (unsigned int i = 0; i < input_vectors_array.size(); i++) //kanoume isomhkh ola ta vectors
       {//hasharw ta vectors k arxikopoiw flags
         //Twra kanoume LSH apo A erwthma sta vectors auta
@@ -368,12 +371,14 @@ void LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered
       }
     }//telos for gia ka8e grid
 
+
     int num_unassigned = n; //posa exoun meinei xwris anathesh
     double radius = initialize_radius_curve(clusters);
     std::vector<std::string> this_center_neighbs;
     std::vector<std::string> this_HT_neighbs;
     bool repetition = false;
     int kill_countdown = 15; //an den exoun ginei nees anatheseis meta apo tosous diplasiasmous aktinas, stop
+    std::cout << "aaaanteksaaaaa\n";
     int num_unassigned_prev = num_unassigned; //arithmos unassigned shmeiwn prin th loypa gia na sugkrinoyme proodo kathe fora kai na stamatame
 
     while((num_unassigned > n/10) && (kill_countdown >0) ){ //h anazhthsh range search lsh tha ginetai mexri to 90% twn shmeiwn ginei assign se kapoio kentro. Epeita klassikh methodos opws prota8hke
@@ -392,9 +397,9 @@ void LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered
           converted_center = vectorify(grid_center);
           add_pad(&converted_center, 100 * max_coord, max_dims_in);
           this_HT_neighbs = grids_v[j].hash_table.hash_query(&converted_center,(*clusters)[i].get_center_ptr(), radius, repetition);
-          //std::cout << this_HT_neighbs.size() << "-";
+          std::cout << this_HT_neighbs.size() << "-";
           this_center_neighbs.insert(this_center_neighbs.end(), this_HT_neighbs.begin(), this_HT_neighbs.end());
-          //std::cout << this_center_neighbs.size() << " ";
+          std::cout << this_center_neighbs.size() << " ";
         }
         //pros8hkh shmeiwn se cluster kai flag gia na mhn to paroyn kai ta ypoloipa clusters
         //std::cout << "eimai to cl " << (*clusters)[i].get_center_id() << "kai "<<this_center_neighbs.size() << "\n";

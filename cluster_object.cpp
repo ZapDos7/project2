@@ -143,6 +143,13 @@ curve<T> * curve_cluster<T>::get_center_ptr()
 }
 
 template <class T>
+curve<T> curve_cluster<T>::get_center()
+{
+    return center;
+}
+
+
+template <class T>
 void curve_cluster<T>::print_cluster()
 {
     //std::cout << x.first << x.second.get_id() << "\n";

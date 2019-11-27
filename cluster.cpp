@@ -221,10 +221,20 @@ int main(int argc, char *argv[])
     double delta = twoelems.second;
     double max_coord_lsh = twoelems.first;
     //initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
-    initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
-    for(unsigned int i = 0; i < clusters.size(); i++){
-      clusters[i].print_cluster();
-    }
+    initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
+    //LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
+    curve<double> mika;
+    mika.set_id(clusters[0].get_center().get_id());
+    mika.set_points(clusters[0].get_center().get_points());
+    //std::cout << dtw( &(mika)  , &(curves_array["4407"])    );
+    std::cout << clusters[0].get_center_ptr()->get_points().size(); //PROVLHMA DTW SIZE??/
+    /*for(auto x: curves_array){
+      std::cout <<"\n" << "eimai " << x.first << "me " << x.second.get_size()<<"\t";
+      for(int i=0; i< x.second.get_points().size(); i++){
+        std::cout << x.second.get_points()[i].get_x() << "," << x.second.get_points()[i].get_y();
+      }
+    }*/
+
   }
   else{
     std::cout << "Den orises ti typou dedomena exoyme sthn prwth grammh opws eipe h ekfnwhsh, Enjoy the exit :* xoxo\n";
