@@ -223,12 +223,14 @@ int main(int argc, char *argv[])
     double max_coord_lsh = twoelems.first;
     //initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
-    LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
+    lloyd_ass_curve(&clusters, &curves_array);
+    //LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
     for(unsigned int i = 0; i < clusters.size(); i++){
       clusters[i].print_cluster();
     }
     update_pam_curve(&clusters);
-    LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
+    lloyd_ass_curve(&clusters, &curves_array);
+    //LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
     for(unsigned int i = 0; i < clusters.size(); i++){
       clusters[i].print_cluster();
     }
@@ -238,7 +240,4 @@ int main(int argc, char *argv[])
     std::cout << "Den orises ti typou dedomena exoyme sthn prwth grammh opws eipe h ekfnwhsh, Enjoy the exit :* xoxo\n";
     exit(-1);
   }
-
-
-
 }

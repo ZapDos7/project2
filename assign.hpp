@@ -231,6 +231,34 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
 
 
 //////////////////////CURVES////////////////////////////////////
+//LLOYD - each input vector to it nearest! - curve time
+template <typename T>
+void lloyd_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map<std::string, curve<T> > *curves_array)
+{
+    for (auto x :(*curves_array))
+    {
+        double min1 = std::numeric_limits<double>::max(); //apeiro
+        int min_clust_index = -1; //to index tou cluster opou anoikei kathe x
+        for (unsigned int j = 0; j < (*clusters).size(); j++)
+        {
+            double tmp = 0.0;
+            tmp = dtw( &((*curves_array)[x.first]), (*clusters)[j].get_center_ptr()); //dist(x.second.get_v(), (*clusters)[j].get_center_coords())
+            if (tmp < min1)
+            {
+                min1 = tmp;
+                min_clust_index = j;
+            }
+            //std::cout << "Eimai " << x.first << " & sugkrinw " << (*clusters)[j].get_center_id() << " dist " << tmp << '\n';
+        }
+        (*clusters)[min_clust_index].incorporate_point(&((*curves_array)[x.first]));
+        //std::cout << "Eimai " << x.first << " & kentro " << (*clusters)[min_clust_index].get_center_id() << " dist " << min1 << '\n';
+        //std::cout << '\n';
+    }
+    //std::cout << "\n\n\n";
+}
+
+
+
 template <typename T>
 my_vector<T> vectorify(curve<T> gc) //kanw to grid curve --> vector
 {
