@@ -46,8 +46,9 @@ void update_mean(std::vector<cluster<T>> * clusts, int diastaseis){
   for(unsigned int i=0; i< (*clusts).size(); i++){ //gia ka8e cluster
     T mean_coords[diastaseis] = {0.0};
     unsigned int n = (*clusts)[i].get_set_of_points()->size();
-    for(auto x:(*(*clusts)[i].get_set_of_points()) ){
-
+    std::unordered_map<std::string, my_vector<T> * > * clust_points = (*clusts)[i].get_set_of_points();
+    for(auto x:*clust_points ){
+      //std::cout << "henlo  " << x.second->get_v().size();
       for(unsigned int j=0; j< x.second->get_v().size(); j++ ){
         mean_coords[j] += x.second->get_v()[j] ;
       }//telos for gia tis suntetagmenes enos shmeiou tou cluster

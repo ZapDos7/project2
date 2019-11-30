@@ -10,8 +10,9 @@
 
 //LLOYD - each input vector to it nearest!
 template <typename T>
-void lloyd_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::string, my_vector<T> > *vectors_array)
+double lloyd_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::string, my_vector<T> > *vectors_array)
 {
+    double obj_fun = 0.0;
     for (auto x :(*vectors_array))
     {
         double min1 = std::numeric_limits<double>::max(); //apeiro
@@ -27,11 +28,13 @@ void lloyd_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::string
             }
             //std::cout << "Eimai " << x.first << " & sugkrinw " << (*clusters)[j].get_center_id() << " dist " << tmp << '\n';
         }
-        (*clusters)[min_clust_index].incorporate_point(&(x.second));
+        (*clusters)[min_clust_index].incorporate_point( &((*vectors_array)[x.first]) );
+        obj_fun += min1;
         //std::cout << "Eimai " << x.first << " & kentro " << (*clusters)[min_clust_index].get_center_id() << " dist " << min1 << '\n';
         //std::cout << '\n';
     }
     //std::cout << "\n\n\n";
+    return obj_fun;
 }
 
 
@@ -79,7 +82,7 @@ double initialize_radius_curve(std::vector<curve_cluster<T>>* clusters)
 
 
 template <typename T> //APO ERGASIA 1
-void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::string, my_vector<T> > *vectors_array,int diastaseis ,int number_of_vector_hash_tables, int number_of_vector_hash_functions)
+double LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::string, my_vector<T> > *vectors_array,int diastaseis ,int number_of_vector_hash_tables, int number_of_vector_hash_functions)
 {
     //auto start_of_w_calc = std::chrono::high_resolution_clock::now();
     std::vector<NNpair> input_actual_NNs; //pinakas apo zeugaria actual NNs me prwto stoixeio to p
@@ -205,6 +208,7 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
 
 
     //twra an kapoio exei meinei akaparwto, prepei na paei sto kontinotero tou kentro
+    double objective_function = 0.0;
     for(auto x: owned){
       if(x.second.first == -1){ //akaparwto
         double min1 = std::numeric_limits<double>::max(); //apeiro
@@ -222,9 +226,14 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
             //std::cout << "Eimai " << x.first << " & sugkrinw " << (*clusters)[j].get_center_id() << " dist " << tmp << '\n';
         }
         (*clusters)[min_clust_index].incorporate_point(&((*vectors_array)[x.first]));
+        objective_function += min1;
+      }
+      else{ //kaparwmeno, ypologizw aplws apostash gia to objectve function
+        objective_function += manhattan_distance( (*vectors_array)[x.first].get_v() , (*clusters)[x.second.first].get_center_coords() ); //h  apostash metaksu tou shmeiou kai tou kentro poy to kaparwse
       }
     }//telos for gia akaparwta
 
+    return objective_function;
 }//telos sunarthshs
 
 
@@ -233,8 +242,9 @@ void LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::st
 //////////////////////CURVES////////////////////////////////////
 //LLOYD - each input vector to it nearest! - curve time
 template <typename T>
-void lloyd_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map<std::string, curve<T> > *curves_array)
+double lloyd_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map<std::string, curve<T> > *curves_array)
 {
+    double objective_function = 0.0;
     for (auto x :(*curves_array))
     {
         double min1 = std::numeric_limits<double>::max(); //apeiro
@@ -251,10 +261,12 @@ void lloyd_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map
             //std::cout << "Eimai " << x.first << " & sugkrinw " << (*clusters)[j].get_center_id() << " dist " << tmp << '\n';
         }
         (*clusters)[min_clust_index].incorporate_point(&((*curves_array)[x.first]));
+        objective_function += min1;
         //std::cout << "Eimai " << x.first << " & kentro " << (*clusters)[min_clust_index].get_center_id() << " dist " << min1 << '\n';
         //std::cout << '\n';
     }
     //std::cout << "\n\n\n";
+    return objective_function;
 }
 
 
@@ -308,7 +320,7 @@ void add_pad(my_vector<T> *gcv, double timi, unsigned int max_vec_size)
 
 
 template <typename T> //APO ERGASIA 1
-void LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map<std::string, curve<T> > *curves_array, int number_of_grids, int number_of_lsh_hash_functions, double delta, double max_coord)
+double LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map<std::string, curve<T> > *curves_array, int number_of_grids, int number_of_lsh_hash_functions, double delta, double max_coord)
 {
     //auto start_of_w_calc = std::chrono::high_resolution_clock::now();
     std::vector<NNpair> input_actual_NNs; //pinakas apo zeugaria actual NNs me prwto stoixeio to p
@@ -468,6 +480,7 @@ void LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered
 
 
     //twra an kapoio exei meinei akaparwto, prepei na paei sto kontinotero tou kentro
+    double objective_function = 0.0; //gia ton elegxo metavolhs antikeimenikhs sunarthshs
     for(auto x: owned){
       if(x.second.first == -1){ //akaparwto
         double min1 = std::numeric_limits<double>::max(); //apeiro
@@ -485,7 +498,12 @@ void LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered
             //std::cout << "Eimai " << x.first << " & sugkrinw " << (*clusters)[j].get_center_id() << " dist " << tmp << '\n';
         }
         (*clusters)[min_clust_index].incorporate_point(&((*curves_array)[x.first]));
+        objective_function += min1;
+      }
+      else{ //kaparwmeno, aplws ypologismos apostashs gia objective funct
+        objective_function += dtw( &((*curves_array)[x.first]) , (*clusters)[x.second.first].get_center_ptr() ); //apostash kampylhs apo to kentro ths
       }
     }//telos for gia akaparwta
 
+    return objective_function;
 }//telos sunarthshs

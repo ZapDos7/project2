@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
 
     //cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    //initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     //format_clusters(&cluster_centers, &clusters);
 
     //edw mporeis na tsekareis ta kentra oti einai ok
@@ -201,15 +202,19 @@ int main(int argc, char *argv[])
     }*/
 
     /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
-    //lloyd_ass(&clusters, &vectors_array);
-    LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
-    for(unsigned int i = 0; i < clusters.size(); i++){
-      clusters[i].print_cluster();
-    }
+    double objective1 = lloyd_ass(&clusters, &vectors_array);
+    //double objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
 
     //update_mean(&clusters, diastaseis_vecs);
-    update_pam(&clusters);
-    LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
+    for(int i =0; i<10; i++){
+      std::cout << objective1 << "\n";
+      update_pam(&clusters);
+      //update_mean(&clusters, diastaseis_vecs);
+      objective1 = lloyd_ass(&clusters, &vectors_array);
+      //objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
+    }
+
+
     for(unsigned int i = 0; i < clusters.size(); i++){
       clusters[i].print_cluster();
     }
@@ -223,14 +228,16 @@ int main(int argc, char *argv[])
     double max_coord_lsh = twoelems.first;
     //initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
-    lloyd_ass_curve(&clusters, &curves_array);
-    //LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
-    for(unsigned int i = 0; i < clusters.size(); i++){
-      clusters[i].print_cluster();
+    //double objective1 = lloyd_ass_curve(&clusters, &curves_array);
+    double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
+    for(int yi=0; yi<10; yi++){
+      std::cout << objective1 << "\n";
+      update_pam_curve(&clusters);
+      //objective1 =  lloyd_ass_curve(&clusters, &curves_array);
+      objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh);
     }
-    update_pam_curve(&clusters);
-    lloyd_ass_curve(&clusters, &curves_array);
-    //LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
+
+
     for(unsigned int i = 0; i < clusters.size(); i++){
       clusters[i].print_cluster();
     }
