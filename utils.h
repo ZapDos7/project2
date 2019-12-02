@@ -194,4 +194,142 @@ std::pair<double, T> calculate_delta(std::unordered_map<std::string, curve<T> > 
 }
 
 
+//Silhouette - My_Vector
+template <typename T>
+std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
+{
+  
+  std::vector<double> epistrepsima; //double == to avg si tou cluster autou
+
+
+  std::vector<my_vector<T>> ta_kentra; //edw krataw ta kentra twn cluster mono gia na ta exw pio eukola parakatw
+  my_vector<T> tmp_kentro;
+  ta_kentra.clear();
+  for (unsigned int i = 0; i < clusters->size(); i++)
+  {
+    tmp_kentro.set_id((*clusters)[i].get_center_id());
+    tmp_kentro.set_v((*clusters)[i].get_center_coords());
+    ta_kentra.push_back(tmp_kentro);
+  }
+  if (ta_kentra.size() != clusters->size())
+  {
+    std::cerr << "Silhouette error (1)\n";
+    exit(-1);
+  }
+
+  std::vector<double> avg_si; //gia upologismo tou average ana cluster
+  double si = 0.0;
+    
+  for (unsigned int i = 0; i < clusters->size(); i++)//gia kathe cluster
+  {
+    double min1 = std::numeric_limits<double>::max(); //apeiro
+    avg_si.clear();
+    si = 0.0;
+    std::unordered_map<std::string, my_vector<T> * > * clust_points = (*clusters)[i].get_set_of_points();
+    for (auto x:*clust_points)//gia kathe shmeio tou cluster
+    {
+      std::vector<double> apostaseis_i;
+      apostaseis_i.clear();
+      for (auto y:*clust_points)//ta alla shmeia tou cluster autou
+      {
+        /*if (x.first == y.first)
+          continue;
+        */
+        apostaseis_i.push_back(manhattan_distance(x.second->get_v(), y.second->get_v()));
+      }
+      double mesi_apostasi_ai;
+      //avg dist apo shmeia idiou cluster
+      for (unsigned int j = 0; j < apostaseis_i.size(); j++)
+      {
+        mesi_apostasi_ai += apostaseis_i[j];
+      }
+      mesi_apostasi_ai /= apostaseis_i.size(); //a(i)
+      apostaseis_i.clear();
+
+      //vres next closest cluster
+      for (unsigned int j = 0; j < ta_kentra.size(); j++)
+      {
+        if ((ta_kentra[j].get_id() == (*clusters)[i].get_center_id())&& (ta_kentra[j].get_v() == (*clusters)[i].get_center_coords())) //an einai to idi kentro
+          continue;
+        else
+          apostaseis_i.push_back(manhattan_distance(x.second->get_v(), ta_kentra[j].get_v()));
+      }
+      min1 = std::numeric_limits<double>::max(); //apeiro
+      int index_next_best_clust_cnt = -1;
+      for (unsigned int j = 0; j < apostaseis_i.size(); j++)
+      {
+        if (min1 > apostaseis_i[j])
+        {
+          min1 = apostaseis_i[j];
+          index_next_best_clust_cnt = j;
+        }
+      }
+      if (index_next_best_clust_cnt < 0)
+      {
+        std::cerr << "Error in Silhouette (2)" << '\n';
+        exit(-1);
+      }
+      apostaseis_i.clear();
+      double mesi_apostasi_bi;
+      //to index_next_best_clust_cnt krataei thn thesi tou next closest cluster opote:
+      //ta_kentra[index_next_best_clust_cnt] ==  to kentro pou mas noiazei, tr thelw na vrw se poio cluster afora
+      for (unsigned int j = 0; j < clusters->size(); j++)
+      {
+        //sto katallilo cluster aka to next best
+        if ((*clusters)[j].get_center_id() == ta_kentra[index_next_best_clust_cnt].get_id())
+        {
+          std::unordered_map<std::string, my_vector<T> * > * clust_points2 = (*clusters)[j].get_set_of_points();
+          for (auto y:*clust_points2)//ta alla shmeia tou cluster autou
+          {
+            apostaseis_i.push_back(manhattan_distance(x.second->get_v(), y.second->get_v()));
+          }
+          //avg dist apo shmeia tou next best cluster
+          for (unsigned int k = 0; k < apostaseis_i.size(); k++)
+          {
+            mesi_apostasi_bi += apostaseis_i[k];
+          }
+          mesi_apostasi_bi /= apostaseis_i.size(); //b(i)
+        }
+        else
+        {
+          continue;
+        }
+        
+      }
+
+      //s(i) = [b(i) - a(i)] / max{a(i), b(i)}
+      si = mesi_apostasi_bi - mesi_apostasi_ai;
+      if (mesi_apostasi_bi > mesi_apostasi_ai)
+        si /= mesi_apostasi_bi;
+      else
+        si /= mesi_apostasi_ai;
+      avg_si.push_back(si);
+    }
+    //avg s(i) per cluster
+    si = 0.0;
+    for (unsigned int j = 0; j < avg_si.size(); j++)
+    {
+      si += avg_si[j];
+    }
+    si /= avg_si.size();
+    std::cerr << si << '\n';
+    epistrepsima.push_back(si);
+  }
+  std::cerr << '\n';
+  return epistrepsima;
+}
+
+//Silhouette - Curves
+
+//allo function gia oliko meso si (idio gia curves & vectors)
+/*double Silhouette_oliko(std::vector<double> sis)
+{
+  double final = 0.0;
+  for (unsigned int i = 0; i < sis.size(); i++)
+  {
+    final += sis[i];
+  }
+  final /= sis.size();
+  return final;
+}*/
 #endif
