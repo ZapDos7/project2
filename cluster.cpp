@@ -24,6 +24,42 @@
 
 std::string repeat_answer = "n";
 
+bool is_ok_to_stop(std::vector<double> * objectives, int ith_rep){
+
+  if(ith_rep >= 25)
+    return true; //tha stamataei otan exei ftasei stis 25 epanalhpseis
+
+  if(ith_rep < 2)
+    return false;
+
+  /*if(objectives->size() == 1)
+    return false;
+
+  if(objectives->size() == 2){
+    if((*objectives)[0] < (*objectives)[1] )
+      return false;
+  }
+
+  if(objectives->size() > 2){
+    for(int i = objectives->size() -2; i>=0; i--){
+      if( (*objectives)[i] == (*objectives)[objectives->size()-1] ){ //bre8hke ksana auth h timh (h teleutaia)
+        if( (*objectives)[i+1] >= (*objectives)[objectives->size()-1] )
+          return true; //tha ksanasunanthsoume th mikroterh timh kai tha stamathsoume tote
+        else
+          return false;
+      }
+    }
+  }*/
+  if((*objectives)[objectives->size()-2] - (*objectives)[objectives->size()-1] < 0)
+    return false;
+
+  if((*objectives)[objectives->size()-2] - (*objectives)[objectives->size()-1] < 0.01 * (*objectives)[objectives->size()-2]){
+    return true;
+  }
+
+  return false;
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -181,8 +217,8 @@ int main(int argc, char *argv[])
     std::vector<cluster<double>> clusters; //ta arxika mas clusters
 
     //cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
-    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
-    //initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
+    //initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     //format_clusters(&cluster_centers, &clusters);
 
     //edw mporeis na tsekareis ta kentra oti einai ok
@@ -203,17 +239,23 @@ int main(int argc, char *argv[])
 
     /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
     double objective1 = lloyd_ass(&clusters, &vectors_array);
+    std::vector<double> objectives;
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
     //double objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
 
     //update_mean(&clusters, diastaseis_vecs);
-    for(int i =0; i<10; i++){
-      std::cout << objective1 << "\n";
-      update_pam(&clusters);
-      //update_mean(&clusters, diastaseis_vecs);
+    int jot = 0;
+    do{
+      jot++;
+      //update_pam(&clusters);
+      update_mean(&clusters, diastaseis_vecs);
       objective1 = lloyd_ass(&clusters, &vectors_array);
+      objectives.push_back(objective1);
       //objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
-    }
-
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
 
     for(unsigned int i = 0; i < clusters.size(); i++){
       clusters[i].print_cluster();
@@ -230,12 +272,19 @@ int main(int argc, char *argv[])
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
     //double objective1 = lloyd_ass_curve(&clusters, &curves_array);
     double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
-    for(int yi=0; yi<10; yi++){
-      std::cout << objective1 << "\n";
+    std::cout << objective1 << "\n";
+    int jot = 0;
+    std::vector<double> objectives;
+    objectives.clear();
+    objectives.push_back(objective1);
+    do{
+      jot++;
       update_pam_curve(&clusters);
-      //objective1 =  lloyd_ass_curve(&clusters, &curves_array);
-      objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh);
-    }
+      objective1 =  lloyd_ass_curve(&clusters, &curves_array);
+      //objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
 
 
     for(unsigned int i = 0; i < clusters.size(); i++){
