@@ -272,6 +272,10 @@ int main(int argc, char *argv[])
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
     //double objective1 = lloyd_ass_curve(&clusters, &curves_array);
     double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
+    std::vector<double> sis = Silhouette_curve(&clusters);
+    double tlk = Silhouette_oliko(sis);
+    std::cerr << tlk << '\n';
+    
     std::cout << objective1 << "\n";
     int jot = 0;
     std::vector<double> objectives;
@@ -290,7 +294,6 @@ int main(int argc, char *argv[])
     for(unsigned int i = 0; i < clusters.size(); i++){
       clusters[i].print_cluster();
     }
-
   }
   else{
     std::cout << "Den orises ti typou dedomena exoyme sthn prwth grammh opws eipe h ekfnwhsh, Enjoy the exit :* xoxo\n";
