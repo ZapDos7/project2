@@ -1,5 +1,4 @@
 #include "utils.h"
-
 #include <unordered_map>
 #include "cluster_object.h"
 #include "my_vector.h"
@@ -7,6 +6,7 @@
 #include "ht.h"
 #include "curve_ht.h"
 #include "grid.h"
+
 
 //LLOYD - each input vector to it nearest!
 template <typename T>
@@ -21,6 +21,11 @@ double lloyd_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::stri
         {
             double tmp = 0.0;
             tmp = manhattan_distance(x.second.get_v(), (*clusters)[j].get_center_coords()); //dist(x.second.get_v(), (*clusters)[j].get_center_coords())
+            /*std::vector<T> weko = (*clusters)[j].get_center_coords();
+            for(unsigned int haha=0; haha< weko.size(); haha++){
+              std::cout << weko[haha] << " ";
+            }
+            std::cout << "\n";*/
             if (tmp < min1)
             {
                 min1 = tmp;
@@ -34,6 +39,37 @@ double lloyd_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::stri
         //std::cout << '\n';
     }
     //std::cout << "\n\n\n";
+    int biggest_index = 0;
+    int maxim_numb = (*clusters)[0].get_set_of_points()->size();
+    for (unsigned int j = 1; j < (*clusters).size(); j++){
+      if((*clusters)[j].get_set_of_points()->size() > maxim_numb){
+        maxim_numb = (*clusters)[j].get_set_of_points()->size();
+        biggest_index = j;
+      }
+    }
+
+    //prepei na sigoureutw oti den yparxei adeio cluster. An yparxei, pare to makrynotero shmeio tou pio megalou cluster. Einai apodekth methodos
+    for (unsigned int j = 0; j < (*clusters).size(); j++){
+      std::unordered_map<std::string, my_vector<T> * > * clust_points = (*clusters)[j].get_set_of_points();
+      if((* clust_points).size() < 1){
+        //std::cout << "yparxei adeio cluster!\n";
+        std::unordered_map<std::string, my_vector<T> * > * big_points = (*clusters)[biggest_index].get_set_of_points();
+        double max_distn = std::numeric_limits<double>::max();           //apeiro kai kala
+        max_distn = -1 * max_distn;                               //arxika -apeiro
+        std::string worst_id;
+        for(auto xy: *big_points){
+          double dis_dist = manhattan_distance(xy.second->get_v(), (*clusters)[biggest_index].get_center_coords());
+          if(dis_dist > max_distn){
+            max_distn = dis_dist;
+            worst_id = xy.first;
+          } //telos if apostashs
+        } //telos for anazhthshs sto pio xontrouli cluster
+        (*clusters)[biggest_index].discorporate_point(&((*vectors_array)[worst_id]));
+        obj_fun -= max_distn;
+        (*clusters)[j].incorporate_point(&((*vectors_array)[worst_id]));
+        obj_fun += manhattan_distance((*vectors_array)[worst_id].get_v(), (*clusters)[j].get_center_coords());;
+      }//telos if periptwshs adeiou cluster
+    } //telos for gia anazhthsh adeiwn clusters
     return obj_fun;
 }
 
@@ -82,49 +118,55 @@ double initialize_radius_curve(std::vector<curve_cluster<T>>* clusters)
 
 
 template <typename T> //APO ERGASIA 1
-double LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::string, my_vector<T> > *vectors_array,int diastaseis ,int number_of_vector_hash_tables, int number_of_vector_hash_functions)
+double LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::string, my_vector<T> > *vectors_array,int diastaseis ,int number_of_vector_hash_tables, int number_of_vector_hash_functions, double *w_done)
 {
-    //auto start_of_w_calc = std::chrono::high_resolution_clock::now();
-    std::vector<NNpair> input_actual_NNs; //pinakas apo zeugaria actual NNs me prwto stoixeio to p
-    for (auto x :(*vectors_array))
-    { //prepei na brw ta zeugaria ap to input gia ypologismo w
+    double w = *w_done;
+    if(*w_done < 0){ //den exei ypologistei to w, pame na to broume
+      //auto start_of_w_calc = std::chrono::high_resolution_clock::now();
+      std::vector<NNpair> input_actual_NNs; //pinakas apo zeugaria actual NNs me prwto stoixeio to p
+      for (auto x :(*vectors_array))
+      { //prepei na brw ta zeugaria ap to input gia ypologismo w
 
-      std::string min_id1;
-      double min1 = std::numeric_limits<double>::max(); //min pairnei timh apeiro
-      for (auto y :(*vectors_array))
-      {
-        if (manhattan_distance(x.second.get_v(), y.second.get_v()) == 0) //einai to idio shmeio
-          continue;
-
-        if (manhattan_distance(x.second.get_v(), y.second.get_v()) < min1)
+        std::string min_id1;
+        double min1 = std::numeric_limits<double>::max(); //min pairnei timh apeiro
+        for (auto y :(*vectors_array))
         {
-          min1 = manhattan_distance(x.second.get_v(), y.second.get_v());
-          min_id1 =  y.second.get_id();
+          if (manhattan_distance(x.second.get_v(), y.second.get_v()) == 0) //einai to idio shmeio
+            continue;
+
+          if (manhattan_distance(x.second.get_v(), y.second.get_v()) < min1)
+          {
+            min1 = manhattan_distance(x.second.get_v(), y.second.get_v());
+            min_id1 =  y.second.get_id();
+          }
         }
+        NNpair single_pair1(x.second.get_id(), min_id1);
+        single_pair1.set_distance(min1);
+        input_actual_NNs.push_back(single_pair1);
       }
-      NNpair single_pair1(x.second.get_id(), min_id1);
-      single_pair1.set_distance(min1);
-      input_actual_NNs.push_back(single_pair1);
+
+      double tmp = 0.0;
+      double mean_distance = 0;
+      for (unsigned int i = 0; i < input_actual_NNs.size(); i++)
+      {
+        tmp += input_actual_NNs.at(i).get_distance();
+      }
+      //int diastaseis = vectors_array->begin().second.get_v().size(); //gia hash tables
+      //std::cout << "diasteaseis " << diastaseis << "\n";
+
+      mean_distance = tmp / input_actual_NNs.size(); //fp division
+      //auto end_of_w_calc = std::chrono::high_resolution_clock::now() - start_of_w_calc;
+      //long long microseconds_w = std::chrono::duration_cast<std::chrono::microseconds>(end_of_w_calc).count();
+      //fprintf(stderr, "Time needed for w calculation is %lld microseconds.\n\n", microseconds_w);
+      fprintf(stderr, "Value of w = %f\n", mean_distance);
+      //also test gia w = 10 * mean_distance
+      /*const*/ w = 4 * mean_distance; //to w pou vazw sta ai, STH XEIROTERH HARD CODED
+      *w_done = w; //ypologisthke prwth kai teleutaia fora!
     }
 
-    double tmp = 0.0;
-    double mean_distance = 0;
-    for (unsigned int i = 0; i < input_actual_NNs.size(); i++)
-    {
-      tmp += input_actual_NNs.at(i).get_distance();
-    }
-    //int diastaseis = vectors_array->begin().second.get_v().size(); //gia hash tables
-    //std::cout << "diasteaseis " << diastaseis << "\n";
-    int Table_Size = (*vectors_array).size() / 8;
-    mean_distance = tmp / input_actual_NNs.size(); //fp division
-    //auto end_of_w_calc = std::chrono::high_resolution_clock::now() - start_of_w_calc;
-    //long long microseconds_w = std::chrono::duration_cast<std::chrono::microseconds>(end_of_w_calc).count();
-    //fprintf(stderr, "Time needed for w calculation is %lld microseconds.\n\n", microseconds_w);
-    fprintf(stderr, "Value of w = %f\n", mean_distance);
-    //also test gia w = 10 * mean_distance
-    /*const*/ double w = 4 * mean_distance; //to w pou vazw sta ai, STH XEIROTERH HARD CODED
 
     /////////////////////////////LSH TIME////////////////////////////////
+    int Table_Size = (*vectors_array).size() / 8;
     std::vector<ht<T>> our_hash_tables;
     for (int i = 0; i < number_of_vector_hash_tables; i++)
     {
@@ -233,6 +275,38 @@ double LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::
       }
     }//telos for gia akaparwta
 
+    int biggest_index = 0;
+    int maxim_numb = (*clusters)[0].get_set_of_points()->size();
+    for (unsigned int j = 1; j < (*clusters).size(); j++){
+      if((*clusters)[j].get_set_of_points()->size() > maxim_numb){
+        maxim_numb = (*clusters)[j].get_set_of_points()->size();
+        biggest_index = j;
+      }
+    }
+
+    //prepei na sigoureutw oti den yparxei adeio cluster. An yparxei, pare to makrynotero shmeio tou pio megalou cluster. Einai apodekth methodos
+    for (unsigned int j = 0; j < (*clusters).size(); j++){
+      std::unordered_map<std::string, my_vector<T> * > * clust_points = (*clusters)[j].get_set_of_points();
+      if((* clust_points).size() < 1){
+        std::cout << "yparxei adeio cluster!\n";
+        std::unordered_map<std::string, my_vector<T> * > * big_points = (*clusters)[biggest_index].get_set_of_points();
+        double max_distn = std::numeric_limits<double>::max();           //apeiro kai kala
+        max_distn = -1 * max_distn;                               //arxika -apeiro
+        std::string worst_id;
+        for(auto xy: *big_points){
+          double dis_dist = manhattan_distance(xy.second->get_v(), (*clusters)[biggest_index].get_center_coords());
+          if(dis_dist > max_distn){
+            max_distn = dis_dist;
+            worst_id = xy.first;
+          } //telos if apostashs
+        } //telos for anazhthshs sto pio xontrouli cluster
+        (*clusters)[biggest_index].discorporate_point(&((*vectors_array)[worst_id]));
+        objective_function -= max_distn;
+        (*clusters)[j].incorporate_point(&((*vectors_array)[worst_id]));
+        objective_function += manhattan_distance((*vectors_array)[worst_id].get_v(), (*clusters)[j].get_center_coords());;
+      }//telos if periptwshs adeiou cluster
+    } //telos for gia anazhthsh adeiwn clusters
+
     return objective_function;
 }//telos sunarthshs
 
@@ -266,6 +340,38 @@ double lloyd_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_m
         //std::cout << '\n';
     }
     //std::cout << "\n\n\n";
+    int biggest_index = 0;
+    int maxim_numb = (*clusters)[0].get_set_of_curves()->size();
+    for (unsigned int j = 1; j < (*clusters).size(); j++){
+      if((*clusters)[j].get_set_of_curves()->size() > maxim_numb){
+        maxim_numb = (*clusters)[j].get_set_of_curves()->size();
+        biggest_index = j;
+      }
+    }
+
+    //prepei na sigoureutw oti den yparxei adeio cluster. An yparxei, pare to makrynotero shmeio tou pio megalou cluster. Einai apodekth methodos
+    for (unsigned int j = 0; j < (*clusters).size(); j++){
+      std::unordered_map<std::string, curve<T> * > * clust_points = (*clusters)[j].get_set_of_curves();
+      if((* clust_points).size() < 1){
+        std::cout << "yparxei adeio cluster!\n";
+        std::unordered_map<std::string, curve<T> * > * big_points = (*clusters)[biggest_index].get_set_of_curves();
+        double max_distn = std::numeric_limits<double>::max();           //apeiro kai kala
+        max_distn = -1 * max_distn;                               //arxika -apeiro
+        std::string worst_id;
+        for(auto xy: *big_points){
+          double dis_dist = dtw(xy.second, (*clusters)[biggest_index].get_center_ptr());
+          if(dis_dist > max_distn){
+            max_distn = dis_dist;
+            worst_id = xy.first;
+          } //telos if apostashs
+        } //telos for anazhthshs sto pio xontrouli cluster
+        (*clusters)[biggest_index].discorporate_point(&((*curves_array)[worst_id]));
+        objective_function -= max_distn;
+        (*clusters)[j].incorporate_point(&((*curves_array)[worst_id]));
+        objective_function += dtw(&((*curves_array)[worst_id]), (*clusters)[j].get_center_ptr());;
+      }//telos if periptwshs adeiou cluster
+    } //telos for gia anazhthsh adeiwn clusters
+
     return objective_function;
 }
 
@@ -320,53 +426,59 @@ void add_pad(my_vector<T> *gcv, double timi, unsigned int max_vec_size)
 
 
 template <typename T> //APO ERGASIA 1
-double LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map<std::string, curve<T> > *curves_array, int number_of_grids, int number_of_lsh_hash_functions, double delta, double max_coord)
+double LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_map<std::string, curve<T> > *curves_array, int number_of_grids, int number_of_lsh_hash_functions, double delta, double max_coord, double * w_done)
 {
-    //auto start_of_w_calc = std::chrono::high_resolution_clock::now();
-    std::vector<NNpair> input_actual_NNs; //pinakas apo zeugaria actual NNs me prwto stoixeio to p
-    int n =0;
-    for (auto x :(*curves_array))
-    { //prepei na brw ta zeugaria ap to input gia ypologismo w
+    double w = *w_done;
+    if(*w_done < 0){ //den exei ypologistei, pame gia 1h kai teleutaia fora to w tou lsh
+      //auto start_of_w_calc = std::chrono::high_resolution_clock::now();
+      std::vector<NNpair> input_actual_NNs; //pinakas apo zeugaria actual NNs me prwto stoixeio to p
+      //int n =0;
+      for (auto x :(*curves_array))
+      { //prepei na brw ta zeugaria ap to input gia ypologismo w
 
-      std::string min_id1;
-      double min1 = std::numeric_limits<double>::max(); //min pairnei timh apeiro
-      for (auto y :(*curves_array))
-      {
-        if (dtw(&(x.second), &(y.second)) == 0){
-          if(x.second.get_id() == y.second.get_id()){
-            continue;
+        std::string min_id1;
+        double min1 = std::numeric_limits<double>::max(); //min pairnei timh apeiro
+        for (auto y :(*curves_array))
+        {
+          if (dtw(&(x.second), &(y.second)) == 0){
+            if(x.second.get_id() == y.second.get_id()){
+              continue;
+            }
+          }
+
+          if (dtw(&(x.second), &(y.second)) < min1)
+          {
+            min1 = dtw(&(x.second), &(y.second));
+            min_id1 =  y.second.get_id();
           }
         }
-
-        if (dtw(&(x.second), &(y.second)) < min1)
-        {
-          min1 = dtw(&(x.second), &(y.second));
-          min_id1 =  y.second.get_id();
-        }
+        NNpair single_pair1(x.second.get_id(), min_id1);
+        single_pair1.set_distance(min1);
+        input_actual_NNs.push_back(single_pair1);
+        //n++;
       }
-      NNpair single_pair1(x.second.get_id(), min_id1);
-      single_pair1.set_distance(min1);
-      input_actual_NNs.push_back(single_pair1);
-      n++;
-    }
 
-    double tmp = 0.0;
-    double mean_distance = 0;
-    for (unsigned int i = 0; i < input_actual_NNs.size(); i++)
-    {
-      tmp += input_actual_NNs.at(i).get_distance();
+      double tmp = 0.0;
+      double mean_distance = 0;
+      for (unsigned int i = 0; i < input_actual_NNs.size(); i++)
+      {
+        tmp += input_actual_NNs.at(i).get_distance();
+      }
+      //int diastaseis = vectors_array->begin().second.get_v().size(); //gia hash tables
+      //std::cout << "diasteaseis " << diastaseis << "\n";
+      mean_distance = tmp / input_actual_NNs.size(); //fp division
+      //auto end_of_w_calc = std::chrono::high_resolution_clock::now() - start_of_w_calc;
+      //long long microseconds_w = std::chrono::duration_cast<std::chrono::microseconds>(end_of_w_calc).count();
+      //fprintf(stderr, "Time needed for w calculation is %lld microseconds.\n\n", microseconds_w);
+      fprintf(stderr, "Value of w = %f\n", mean_distance);
+      //also test gia w = 10 * mean_distance
+      /*const*/ w = 4 * mean_distance; //to w pou vazw sta ai, STH XEIROTERH HARD CODED
+      *w_done = w; //ypologisthke prwth kai teleutaia fora!
     }
-    unsigned int max_dims_in = 0;
-    //int diastaseis = vectors_array->begin().second.get_v().size(); //gia hash tables
-    //std::cout << "diasteaseis " << diastaseis << "\n";
+    //std::cout << "w izz " << w << "\n";
+    int n = (*curves_array).size() ;
     int Table_Size = (*curves_array).size() / 8;
-    mean_distance = tmp / input_actual_NNs.size(); //fp division
-    //auto end_of_w_calc = std::chrono::high_resolution_clock::now() - start_of_w_calc;
-    //long long microseconds_w = std::chrono::duration_cast<std::chrono::microseconds>(end_of_w_calc).count();
-    //fprintf(stderr, "Time needed for w calculation is %lld microseconds.\n\n", microseconds_w);
-    fprintf(stderr, "Value of w = %f\n", mean_distance);
-    //also test gia w = 10 * mean_distance
-    /*const*/ double w = 4 * mean_distance; //to w pou vazw sta ai, STH XEIROTERH HARD CODED
+    unsigned int max_dims_in = 0;
 
     /////////////////////////////LSH TIME////////////////////////////////
     std::unordered_map<std::string, std::pair<int, double>> owned; //to flag poy lene oi diafaneies gia to an kaparw8hke ena shmeio kai apo poio index kai me poia aktina
@@ -417,7 +529,7 @@ double LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unorder
     std::vector<std::string> this_HT_neighbs;
     bool repetition = false;
     int kill_countdown = 15; //an den exoun ginei nees anatheseis meta apo tosous diplasiasmous aktinas, stop
-    std::cout << "aaaanteksaaaaa\n";
+    //std::cout << "aaaanteksaaaaa\n";
     int num_unassigned_prev = num_unassigned; //arithmos unassigned shmeiwn prin th loypa gia na sugkrinoyme proodo kathe fora kai na stamatame
 
     while((num_unassigned > n/10) && (kill_countdown >0) ){ //h anazhthsh range search lsh tha ginetai mexri to 90% twn shmeiwn ginei assign se kapoio kentro. Epeita klassikh methodos opws prota8hke
@@ -504,6 +616,38 @@ double LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unorder
         objective_function += dtw( &((*curves_array)[x.first]) , (*clusters)[x.second.first].get_center_ptr() ); //apostash kampylhs apo to kentro ths
       }
     }//telos for gia akaparwta
+
+    int biggest_index = 0;
+    int maxim_numb = (*clusters)[0].get_set_of_curves()->size();
+    for (unsigned int j = 1; j < (*clusters).size(); j++){
+      if((*clusters)[j].get_set_of_curves()->size() > maxim_numb){
+        maxim_numb = (*clusters)[j].get_set_of_curves()->size();
+        biggest_index = j;
+      }
+    }
+
+    //prepei na sigoureutw oti den yparxei adeio cluster. An yparxei, pare to makrynotero shmeio tou pio megalou cluster. Einai apodekth methodos
+    for (unsigned int j = 0; j < (*clusters).size(); j++){
+      std::unordered_map<std::string, curve<T> * > * clust_points = (*clusters)[j].get_set_of_curves();
+      if((* clust_points).size() < 1){
+        std::cout << "yparxei adeio cluster!\n";
+        std::unordered_map<std::string, curve<T> * > * big_points = (*clusters)[biggest_index].get_set_of_curves();
+        double max_distn = std::numeric_limits<double>::max();           //apeiro kai kala
+        max_distn = -1 * max_distn;                               //arxika -apeiro
+        std::string worst_id;
+        for(auto xy: *big_points){
+          double dis_dist = dtw(xy.second, (*clusters)[biggest_index].get_center_ptr());
+          if(dis_dist > max_distn){
+            max_distn = dis_dist;
+            worst_id = xy.first;
+          } //telos if apostashs
+        } //telos for anazhthshs sto pio xontrouli cluster
+        (*clusters)[biggest_index].discorporate_point(&((*curves_array)[worst_id]));
+        objective_function -= max_distn;
+        (*clusters)[j].incorporate_point(&((*curves_array)[worst_id]));
+        objective_function += dtw(&((*curves_array)[worst_id]), (*clusters)[j].get_center_ptr());;
+      }//telos if periptwshs adeiou cluster
+    } //telos for gia anazhthsh adeiwn clusters
 
     return objective_function;
 }//telos sunarthshs

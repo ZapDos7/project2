@@ -198,7 +198,7 @@ std::pair<double, T> calculate_delta(std::unordered_map<std::string, curve<T> > 
 template <typename T>
 std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
 {
-  
+
   std::vector<double> epistrepsima; //double == to avg si tou cluster autou
 
 
@@ -219,7 +219,7 @@ std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
 
   std::vector<double> avg_si; //gia upologismo tou average ana cluster
   double si = 0.0;
-    
+
   for (unsigned int i = 0; i < clusters->size(); i++)//gia kathe cluster
   {
     double min1 = std::numeric_limits<double>::max(); //apeiro
@@ -294,7 +294,7 @@ std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
         {
           continue;
         }
-        
+
       }
 
       //s(i) = [b(i) - a(i)] / max{a(i), b(i)}
@@ -323,7 +323,7 @@ std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
 template <typename T>
 std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
 {
-  
+
   std::vector<double> epistrepsima; //double == to avg si tou cluster autou
 
 
@@ -344,7 +344,7 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
 
   std::vector<double> avg_si; //gia upologismo tou average ana cluster
   double si = 0.0;
-    
+
   for (unsigned int i = 0; i < clusters->size(); i++)//gia kathe cluster
   {
     double min1 = std::numeric_limits<double>::max(); //apeiro
@@ -426,7 +426,7 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
         {
           continue;
         }
-        
+
       }
 
       //s(i) = [b(i) - a(i)] / max{a(i), b(i)}
@@ -451,14 +451,15 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
   return epistrepsima;
 }
 //allo function gia oliko meso si (idio gia curves & vectors)
+template <typename T>
 double Silhouette_oliko(std::vector<double> sis)
 {
-  double final = 0.0;
+  double finalf = 0.0;
   for (unsigned int i = 0; i < sis.size(); i++)
   {
-    final += sis[i];
+    finalf += sis[i];
   }
-  final /= sis.size();
-  return final;
+  finalf /= sis.size();
+  return finalf;
 }
 #endif

@@ -54,6 +54,7 @@ void update_mean(std::vector<cluster<T>> * clusts, int diastaseis){
       }//telos for gia tis suntetagmenes enos shmeiou tou cluster
       //n++;
     } //telos for gia kathe shmeiou tou cluster
+    //std::cout << "eimai to n " << n << "\n";
     for(unsigned int z=0; z< diastaseis; z++)
       mean_coords[z] /= n;
     std::vector<T> mean_coordz(mean_coords, mean_coords+diastaseis); //metatroph se vector

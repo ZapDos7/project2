@@ -26,7 +26,7 @@ std::string repeat_answer = "n";
 
 bool is_ok_to_stop(std::vector<double> * objectives, int ith_rep){
 
-  if(ith_rep >= 25)
+  if(ith_rep >= 15)
     return true; //tha stamataei otan exei ftasei stis 25 epanalhpseis
 
   if(ith_rep < 2)
@@ -236,24 +236,25 @@ int main(int argc, char *argv[])
       }
       std::cout << std::endl;
     }*/
-
+    double w_lsh = - 1.0;
     /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
+    //double objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
     double objective1 = lloyd_ass(&clusters, &vectors_array);
     std::vector<double> objectives;
     objectives.clear();
     objectives.push_back(objective1);
     std::cout << objective1 << "\n";
-    //double objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
+    //double objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
 
     //update_mean(&clusters, diastaseis_vecs);
     int jot = 0;
     do{
       jot++;
-      //update_pam(&clusters);
-      update_mean(&clusters, diastaseis_vecs);
+      update_pam(&clusters);
+      //update_mean(&clusters, diastaseis_vecs);
+      //objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
       objective1 = lloyd_ass(&clusters, &vectors_array);
       objectives.push_back(objective1);
-      //objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
 
@@ -268,14 +269,15 @@ int main(int argc, char *argv[])
     std::pair<double, double> twoelems = calculate_delta(&curves_array);
     double delta = twoelems.second;
     double max_coord_lsh = twoelems.first;
-    //initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
-    initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
+    double w_lsh = - 1.0;
+    initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
+    //initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
     //double objective1 = lloyd_ass_curve(&clusters, &curves_array);
-    double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh); //ASSIGNMENT 2
-    std::vector<double> sis = Silhouette_curve(&clusters);
-    double tlk = Silhouette_oliko(sis);
-    std::cerr << tlk << '\n';
-    
+    double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh); //ASSIGNMENT 2
+    //std::vector<double> sis = Silhouette_curve(&clusters);
+    //double tlk = Silhouette_oliko<double>(sis);
+    //std::cerr << tlk << '\n';
+
     std::cout << objective1 << "\n";
     int jot = 0;
     std::vector<double> objectives;
@@ -284,8 +286,8 @@ int main(int argc, char *argv[])
     do{
       jot++;
       update_pam_curve(&clusters);
-      objective1 =  lloyd_ass_curve(&clusters, &curves_array);
-      //objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh);
+      //objective1 =  lloyd_ass_curve(&clusters, &curves_array);
+      objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
