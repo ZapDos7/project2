@@ -395,7 +395,7 @@ int main(int argc, char *argv[])
       outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: ";
       for (unsigned int m = 0; m < clusters[z].get_center_coords().size(); m++)
       {
-        outfile << clusters[z].get_center_coords()[m];
+        outfile << clusters[z].get_center_coords()[m] << ", ";
       }
       outfile << "\n";
     }
@@ -500,7 +500,7 @@ int main(int argc, char *argv[])
       outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: ";
       for (unsigned int m = 0; m < clusters[z].get_center_coords().size(); m++)
       {
-        outfile << clusters[z].get_center_coords()[m];
+        outfile << clusters[z].get_center_coords()[m] << ", ";
       }
       outfile << "\n";
     }
@@ -607,7 +607,7 @@ int main(int argc, char *argv[])
       outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: ";
       for (unsigned int m = 0; m < clusters[z].get_center_coords().size(); m++)
       {
-        outfile << clusters[z].get_center_coords()[m];
+        outfile << clusters[z].get_center_coords()[m]<<", ";
       }
       outfile << "\n";
     }

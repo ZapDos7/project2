@@ -232,9 +232,9 @@ std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
       apostaseis_i.clear();
       for (auto y:*clust_points)//ta alla shmeia tou cluster autou
       {
-        /*if (x.first == y.first)
+        if (x.first == y.first)
           continue;
-        */
+        
         apostaseis_i.push_back(manhattan_distance(x.second->get_v(), y.second->get_v()));
       }
       double mesi_apostasi_ai;
@@ -250,7 +250,7 @@ std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
       for (unsigned int j = 0; j < ta_kentra.size(); j++)
       {
         if ((ta_kentra[j].get_id() == (*clusters)[i].get_center_id())&& (ta_kentra[j].get_v() == (*clusters)[i].get_center_coords())) //an einai to idi kentro
-          continue;
+          apostaseis_i.push_back(-1.0);
         else
           apostaseis_i.push_back(manhattan_distance(x.second->get_v(), ta_kentra[j].get_v()));
       }
@@ -258,6 +258,8 @@ std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
       int index_next_best_clust_cnt = -1;
       for (unsigned int j = 0; j < apostaseis_i.size(); j++)
       {
+        if (apostaseis_i[j]<0)
+          continue;
         if (min1 > apostaseis_i[j])
         {
           min1 = apostaseis_i[j];
@@ -357,9 +359,9 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
       apostaseis_i.clear();
       for (auto y:*clust_points)//ta alla shmeia tou cluster autou
       {
-        /*if (x.first == y.first)
+        if (x.first == y.first)
           continue;
-        */
+        
         apostaseis_i.push_back(dtw(x.second, y.second));
       }
       double mesi_apostasi_ai;
@@ -375,14 +377,7 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
       for (unsigned int j = 0; j < ta_kentra.size(); j++)
       {
         if (ta_kentra[j].get_id() == (*clusters)[i].get_center_id()) //an einai to idi kentro
-        {
-/*          typename std::vector<T>::iterator it2 = ta_kentra[j].get_points().begin();
-          for (typename vector<T>::iterator it = (*clusters)[i].get_center_points().begin(); it != (*clusters)[i].get_center_points().end(); ++it)
-          {
-            if (it == it2)*/
-              continue;
-          /*}*/
-        }
+          apostaseis_i.push_back(-1.0);
         else
           apostaseis_i.push_back(dtw(x.second, &ta_kentra[j]));
       }
@@ -390,6 +385,8 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
       int index_next_best_clust_cnt = -1;
       for (unsigned int j = 0; j < apostaseis_i.size(); j++)
       {
+        if (apostaseis_i[j]<0)
+          continue;
         if (min1 > apostaseis_i[j])
         {
           min1 = apostaseis_i[j];
@@ -436,7 +433,7 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
       else
         si /= mesi_apostasi_ai;
       avg_si.push_back(si);
-    }
+    } //telos ana shmeio
     //avg s(i) per cluster
     si = 0.0;
     for (unsigned int j = 0; j < avg_si.size(); j++)
@@ -446,7 +443,7 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
     si /= avg_si.size();
     //std::cerr << si << '\n';
     epistrepsima.push_back(si);
-  }
+  } //telos ana cluster
   //std::cerr << '\n';
   return epistrepsima;
 }
