@@ -25,6 +25,7 @@
 std::string repeat_answer = "n";
 
 
+
 bool is_ok_to_stop(std::vector<double> * objectives, int ith_rep){
 
   if(ith_rep >= 15)
@@ -204,60 +205,157 @@ int main(int argc, char *argv[])
   //KSEKINAME ANALOGWS TO INPUT TYPE
   if(what_is_the_input == "vectors"){ //EXOUME NA KANOYME ME VECTORS
 
-    //edw mporeis na tsekareis oti ta inputs apo8hkeuthkan ok
-    /*int jujuju = 0;
-    for(auto x:vectors_array){ //to x einai pair me first = kleidi (to id ws string edw) kai second to antikeimno my_vector
-      std::cout << x.first << x.second.get_id() << "\n";
-      for(unsigned int i=0; i< x.second.get_v().size(); i++)
-        std::cout << std::setprecision(12) << x.second.get_v()[i] << " ";
-      std::cout << "\n";
-      jujuju +=1;
-    }
-    std::cout << jujuju;*/
-
     std::vector<cluster<double>> clusters; //ta arxika mas clusters
-
-    //cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
-    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
-    //initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
-    //format_clusters(&cluster_centers, &clusters);
-
-    //edw mporeis na tsekareis ta kentra oti einai ok
-    //for(unsigned int i = 0; i < clusters.size(); i++){
-      //clusters[i].print_cluster();
-    //}
-
-    //checkarw oti ta clusters einai ok
-    /*for (unsigned int i = 0; i < clusters.size(); i++)
-    {
-      std::cout << "Eimai to cluster " << clusters[i].get_center_id() << "kai eimai kala \n";
-      for (int j = 0; j < clusters[i].get_center_coords().size(); j++)
-      {
-        std::cout << clusters[i].get_center_coords()[j] << " " ;
-      }
-      std::cout << std::endl;
-    }*/
-    double w_lsh = - 1.0;
-    /*simplest approach - ka8e shmeio arxika anati8etai sto kontinotero tou kentro*/
-    //double objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+    //INIT-1, ASS-1, UPD-1
+    initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     double objective1 = lloyd_ass(&clusters, &vectors_array);
     std::vector<double> objectives;
     objectives.clear();
     objectives.push_back(objective1);
     std::cout << objective1 << "\n";
-    //double objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
-
-    //update_mean(&clusters, diastaseis_vecs);
     int jot = 0;
     do{
       jot++;
-      //update_pam(&clusters);
-      update_mean(&clusters, diastaseis_vecs);
-      //objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+      update_pam(&clusters);
       objective1 = lloyd_ass(&clusters, &vectors_array);
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-1, ASS-1, UPD-2
+    initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
+    objective1 = lloyd_ass(&clusters, &vectors_array);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_mean(&clusters, diastaseis_vecs);
+      objective1 = lloyd_ass(&clusters, &vectors_array);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-1, ASS-2, UPD-1
+    initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
+    double w_lsh = - 1.0;
+    objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_pam(&clusters);
+      objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-1, ASS-2, UPD-2
+    initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
+    w_lsh = - 1.0;
+    objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_mean(&clusters, diastaseis_vecs);
+      objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-2, ASS-1, UPD-1
+    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    objective1 = lloyd_ass(&clusters, &vectors_array);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_pam(&clusters);
+      objective1 = lloyd_ass(&clusters, &vectors_array);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-2, ASS-1, UPD-2
+    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    objective1 = lloyd_ass(&clusters, &vectors_array);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_mean(&clusters, diastaseis_vecs);
+      objective1 = lloyd_ass(&clusters, &vectors_array);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-2, ASS-2, UPD-1
+    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    w_lsh = - 1.0;
+    objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_pam(&clusters);
+      objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-2, ASS-2, UPD-2
+    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    w_lsh = - 1.0;
+    objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_mean(&clusters, diastaseis_vecs);
+      objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+
 
     for(unsigned int i = 0; i < clusters.size(); i++){
       clusters[i].print_cluster();
@@ -271,19 +369,20 @@ int main(int argc, char *argv[])
     double delta = twoelems.second;
     double max_coord_lsh = twoelems.first;
     double w_lsh = - 1.0;
-    initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
+    std::vector<double> objectives;
     //initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
-    double objective1 = lloyd_ass_curve(&clusters, &curves_array);
     //double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh); //ASSIGNMENT 2
     //std::vector<double> sis = Silhouette_curve(&clusters);
     //double tlk = Silhouette_oliko<double>(sis);
     //std::cerr << tlk << '\n';
 
-    std::cout << objective1 << "\n";
-    int jot = 0;
-    std::vector<double> objectives;
+    //INIT-1, ASS-1, UPD-1
+    initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
+    double objective1 = lloyd_ass_curve(&clusters, &curves_array);
     objectives.clear();
     objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    int jot = 0;
     do{
       jot++;
       update_pam_curve(&clusters);
@@ -292,6 +391,66 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-1, ASS-2, UPD-1
+    initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
+    w_lsh = - 1.0;
+    objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_pam_curve(&clusters);
+      objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-2, ASS-1, UPD-1
+    initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
+    objective1 = lloyd_ass_curve(&clusters, &curves_array);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_pam_curve(&clusters);
+      objective1 = lloyd_ass_curve(&clusters, &curves_array);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
+    //INIT-2, ASS-2, UPD-1
+    initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
+    w_lsh = - 1.0;
+    objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
+    objectives.clear();
+    objectives.push_back(objective1);
+    std::cout << objective1 << "\n";
+    jot = 0;
+    do{
+      jot++;
+      update_pam_curve(&clusters);
+      objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
+      objectives.push_back(objective1);
+      std::cout << objective1 << "\n";
+    }while(!(is_ok_to_stop(&objectives, jot)));
+    //sillhouete
+    //ektypwsh
+
+
 
 
     for(unsigned int i = 0; i < clusters.size(); i++){
