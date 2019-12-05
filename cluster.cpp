@@ -76,7 +76,6 @@ int main(int argc, char *argv[])
   char dataset_path[256];
   char config_path[256];
   char output_path[256];
-  //    $./lsh -d <input file> -q <query file> -k <int> -L <int> -ο <output file>
   for (int i = 0; i < argc; i++)
   {
     if (strcmp("-i", argv[i]) == 0)
@@ -207,6 +206,7 @@ int main(int argc, char *argv[])
 
     std::vector<cluster<double>> clusters; //ta arxika mas clusters
     //INIT-1, ASS-1, UPD-1
+    auto start = std::chrono::high_resolution_clock::now();
     initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     double objective1 = lloyd_ass(&clusters, &vectors_array);
     std::vector<double> objectives;
@@ -221,11 +221,49 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    auto end = std::chrono::high_resolution_clock::now() - start;
+    long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    std::vector<double> sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    if (oset == false)
+    {
+      std::cout << "Define output file path:\n";
+      std::string inp1;
+      std::cin >> output_path;
+    }
+    std::ofstream outfile;
+    outfile.open(output_path);
+    outfile << "Algorithm: I1A1U1\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: " << clusters[z].get_center_id() << "}"<<'\n';
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    double sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
 
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
     //INIT-1, ASS-1, UPD-2
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     objective1 = lloyd_ass(&clusters, &vectors_array);
     objectives.clear();
@@ -239,11 +277,48 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    outfile << "Algorithm: I1A1U2\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: ";
+      for (unsigned int m = 0; m < clusters[z].get_center_coords().size(); m++)
+      {
+        outfile << clusters[z].get_center_coords()[m] << ", ";
+      }
+      outfile << "\n";
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-1, ASS-2, UPD-1
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     double w_lsh = - 1.0;
     objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
@@ -258,11 +333,43 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    outfile << "Algorithm: I1A2U1\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: " << clusters[z].get_center_id() << "}"<<'\n';
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-1, ASS-2, UPD-2
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     w_lsh = - 1.0;
     objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
@@ -277,11 +384,48 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    outfile << "Algorithm: I1A2U2\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: ";
+      for (unsigned int m = 0; m < clusters[z].get_center_coords().size(); m++)
+      {
+        outfile << clusters[z].get_center_coords()[m];
+      }
+      outfile << "\n";
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-2, ASS-1, UPD-1
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
     objective1 = lloyd_ass(&clusters, &vectors_array);
     objectives.clear();
@@ -295,11 +439,43 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    outfile << "Algorithm: I2A1U1\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: " << clusters[z].get_center_id()<<"}" <<'\n';
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-2, ASS-1, UPD-2
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
     objective1 = lloyd_ass(&clusters, &vectors_array);
     objectives.clear();
@@ -313,11 +489,48 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    outfile << "Algorithm: I2A1U2\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: ";
+      for (unsigned int m = 0; m < clusters[z].get_center_coords().size(); m++)
+      {
+        outfile << clusters[z].get_center_coords()[m];
+      }
+      outfile << "\n";
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-2, ASS-2, UPD-1
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
     w_lsh = - 1.0;
     objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
@@ -332,11 +545,43 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    outfile << "Algorithm: I2A2U1\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: " << clusters[z].get_center_id() << "}" <<'\n';
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-2, ASS-2, UPD-2
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
     w_lsh = - 1.0;
     objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
@@ -351,16 +596,49 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
-
-
-
-
-    for(unsigned int i = 0; i < clusters.size(); i++){
-      clusters[i].print_cluster();
+    outfile << "Algorithm: I2A2U2\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_points()->size() << ", centroid: ";
+      for (unsigned int m = 0; m < clusters[z].get_center_coords().size(); m++)
+      {
+        outfile << clusters[z].get_center_coords()[m];
+      }
+      outfile << "\n";
     }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
 
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_points()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
+
+    /*for(unsigned int i = 0; i < clusters.size(); i++){
+      clusters[i].print_cluster();
+    }*/
+    outfile.close();
   }
   else if(what_is_the_input == "curves"){ //an mas do8oun kampyles
 
@@ -370,13 +648,9 @@ int main(int argc, char *argv[])
     double max_coord_lsh = twoelems.first;
     double w_lsh = - 1.0;
     std::vector<double> objectives;
-    //initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
-    //double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh); //ASSIGNMENT 2
-    //std::vector<double> sis = Silhouette_curve(&clusters);
-    //double tlk = Silhouette_oliko<double>(sis);
-    //std::cerr << tlk << '\n';
-
+    
     //INIT-1, ASS-1, UPD-1
+    auto start = std::chrono::high_resolution_clock::now();
     initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
     double objective1 = lloyd_ass_curve(&clusters, &curves_array);
     objectives.clear();
@@ -391,11 +665,51 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
+    auto end = std::chrono::high_resolution_clock::now() - start;
+    long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    std::vector<double> sis = Silhouette_curve(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
     //ektypwsh
+    if (oset == false)
+    {
+      std::cout << "Define output file path:\n";
+      std::string inp1;
+      std::cin >> output_path;
+    }
+    std::ofstream outfile;
+    outfile.open(output_path);
+    outfile << "Algorithm: I1A1U1\n";
+    //ektypwsh
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_curves()->size() << ", centroid: " << clusters[z].get_center_id() << "}" <<'\n';
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    double sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_curves()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-1, ASS-2, UPD-1
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
     w_lsh = - 1.0;
     objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
@@ -410,11 +724,41 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
-    //ektypwsh
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette_curve(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
+    outfile << "Algorithm: I1A2U1\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_curves()->size() << ", centroid: " << clusters[z].get_center_id() << "}" <<'\n';
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_curves()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-2, ASS-1, UPD-1
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
     objective1 = lloyd_ass_curve(&clusters, &curves_array);
     objectives.clear();
@@ -428,11 +772,41 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
-    //ektypwsh
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette_curve(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
+    outfile << "Algorithm: I2A1U1\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_curves()->size() << ", centroid: " << clusters[z].get_center_id() << "}" <<'\n';
+    }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_curves()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
 
 
     //INIT-2, ASS-2, UPD-1
+    start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
     w_lsh = - 1.0;
     objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
@@ -447,15 +821,41 @@ int main(int argc, char *argv[])
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
-    //sillhouete
-    //ektypwsh
-
-
-
-
-    for(unsigned int i = 0; i < clusters.size(); i++){
-      clusters[i].print_cluster();
+    end = std::chrono::high_resolution_clock::now() - start;
+    microseconds = std::chrono::duration_cast<std::chrono::microseconds>(end).count();
+    sis.clear();
+    sis = Silhouette_curve(&clusters); //epistrefei ena vector me tis times twn SI gia kathe cluster
+    outfile << "Algorithm: I2A2U1\n";
+    for (unsigned int z = 0; z < clusters.size(); z++)
+    {
+      outfile << "CLUSTER-" << z << "{size: " << clusters[z].get_set_of_curves()->size() << ", centroid: " << clusters[z].get_center_id() << "}" <<'\n';
     }
+    outfile << "Clustering time: " << end.count() << '\n';
+    outfile << "Silhouette: [";
+    for (unsigned int z = 0; z < sis.size(); z++)
+    {
+      outfile << sis[z] << ",";
+    }
+    sis_all = Silhouette_oliko<double>(sis);
+    outfile << sis_all << "]\n";
+    //optional
+    if (complete == true)
+    {
+      for (unsigned int z = 0; z < clusters.size(); z++)
+      {
+        outfile << "CLUSTER-" << z << "{";
+        for (auto x : *(clusters[z].get_set_of_curves()))
+        {
+          outfile <<  x.second->get_id() << ", ";
+        }
+        outfile << "}\n";
+      }
+    }
+    outfile << "\n";
+
+    /*for(unsigned int i = 0; i < clusters.size(); i++){
+      clusters[i].print_cluster();
+    }*/
   }
   else{
     std::cout << "Den orises ti typou dedomena exoyme sthn prwth grammh opws eipe h ekfnwhsh, Enjoy the exit :* xoxo\n";

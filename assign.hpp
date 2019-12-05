@@ -288,7 +288,7 @@ double LSH_range_ass(std::vector<cluster<T>>* clusters, std::unordered_map<std::
     for (unsigned int j = 0; j < (*clusters).size(); j++){
       std::unordered_map<std::string, my_vector<T> * > * clust_points = (*clusters)[j].get_set_of_points();
       if((* clust_points).size() < 1){
-        std::cout << "yparxei adeio cluster!\n";
+        //std::cout << "yparxei adeio cluster!\n";
         std::unordered_map<std::string, my_vector<T> * > * big_points = (*clusters)[biggest_index].get_set_of_points();
         double max_distn = std::numeric_limits<double>::max();           //apeiro kai kala
         max_distn = -1 * max_distn;                               //arxika -apeiro
@@ -353,7 +353,7 @@ double lloyd_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unordered_m
     for (unsigned int j = 0; j < (*clusters).size(); j++){
       std::unordered_map<std::string, curve<T> * > * clust_points = (*clusters)[j].get_set_of_curves();
       if((* clust_points).size() < 1){
-        std::cout << "yparxei adeio cluster!\n";
+        //std::cout << "yparxei adeio cluster!\n";
         std::unordered_map<std::string, curve<T> * > * big_points = (*clusters)[biggest_index].get_set_of_curves();
         double max_distn = std::numeric_limits<double>::max();           //apeiro kai kala
         max_distn = -1 * max_distn;                               //arxika -apeiro
@@ -630,7 +630,7 @@ double LSH_range_ass_curve(std::vector<curve_cluster<T>>* clusters, std::unorder
     for (unsigned int j = 0; j < (*clusters).size(); j++){
       std::unordered_map<std::string, curve<T> * > * clust_points = (*clusters)[j].get_set_of_curves();
       if((* clust_points).size() < 1){
-        std::cout << "yparxei adeio cluster!\n";
+        //std::cout << "yparxei adeio cluster!\n";
         std::unordered_map<std::string, curve<T> * > * big_points = (*clusters)[biggest_index].get_set_of_curves();
         double max_distn = std::numeric_limits<double>::max();           //apeiro kai kala
         max_distn = -1 * max_distn;                               //arxika -apeiro

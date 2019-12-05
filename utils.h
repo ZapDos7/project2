@@ -312,10 +312,10 @@ std::vector<double> Silhouette(std::vector<cluster<T>>* clusters)
       si += avg_si[j];
     }
     si /= avg_si.size();
-    std::cerr << si << '\n';
+    //std::cerr << si << '\n';
     epistrepsima.push_back(si);
   }
-  std::cerr << '\n';
+  //std::cerr << '\n';
   return epistrepsima;
 }
 
@@ -444,12 +444,14 @@ std::vector<double> Silhouette_curve(std::vector<curve_cluster<T>>* clusters)
       si += avg_si[j];
     }
     si /= avg_si.size();
-    std::cerr << si << '\n';
+    //std::cerr << si << '\n';
     epistrepsima.push_back(si);
   }
-  std::cerr << '\n';
+  //std::cerr << '\n';
   return epistrepsima;
 }
+
+
 //allo function gia oliko meso si (idio gia curves & vectors)
 template <typename T>
 double Silhouette_oliko(std::vector<double> sis)
