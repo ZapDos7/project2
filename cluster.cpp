@@ -24,6 +24,7 @@
 
 std::string repeat_answer = "n";
 
+
 bool is_ok_to_stop(std::vector<double> * objectives, int ith_rep){
 
   if(ith_rep >= 15)
@@ -217,8 +218,8 @@ int main(int argc, char *argv[])
     std::vector<cluster<double>> clusters; //ta arxika mas clusters
 
     //cluster_centers = initialise_centers<double>(number_of_clusters, &vectors_array);
-    //initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
-    initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
+    initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
+    //initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
     //format_clusters(&cluster_centers, &clusters);
 
     //edw mporeis na tsekareis ta kentra oti einai ok
@@ -250,8 +251,8 @@ int main(int argc, char *argv[])
     int jot = 0;
     do{
       jot++;
-      update_pam(&clusters);
-      //update_mean(&clusters, diastaseis_vecs);
+      //update_pam(&clusters);
+      update_mean(&clusters, diastaseis_vecs);
       //objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
       objective1 = lloyd_ass(&clusters, &vectors_array);
       objectives.push_back(objective1);
@@ -272,8 +273,8 @@ int main(int argc, char *argv[])
     double w_lsh = - 1.0;
     initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
     //initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters); //INITIALIZATION 2
-    //double objective1 = lloyd_ass_curve(&clusters, &curves_array);
-    double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh); //ASSIGNMENT 2
+    double objective1 = lloyd_ass_curve(&clusters, &curves_array);
+    //double objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh); //ASSIGNMENT 2
     //std::vector<double> sis = Silhouette_curve(&clusters);
     //double tlk = Silhouette_oliko<double>(sis);
     //std::cerr << tlk << '\n';
@@ -286,8 +287,8 @@ int main(int argc, char *argv[])
     do{
       jot++;
       update_pam_curve(&clusters);
-      //objective1 =  lloyd_ass_curve(&clusters, &curves_array);
-      objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
+      objective1 =  lloyd_ass_curve(&clusters, &curves_array);
+      //objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
       objectives.push_back(objective1);
       std::cout << objective1 << "\n";
     }while(!(is_ok_to_stop(&objectives, jot)));
@@ -301,4 +302,5 @@ int main(int argc, char *argv[])
     std::cout << "Den orises ti typou dedomena exoyme sthn prwth grammh opws eipe h ekfnwhsh, Enjoy the exit :* xoxo\n";
     exit(-1);
   }
+
 }
