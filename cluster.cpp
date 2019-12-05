@@ -371,7 +371,7 @@ int main(int argc, char *argv[])
     //INIT-1, ASS-2, UPD-2
     start = std::chrono::high_resolution_clock::now();
     initialise_centers<double>(number_of_clusters, &vectors_array, &clusters);
-    w_lsh = - 1.0;
+    //w_lsh = - 1.0;
     objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
     objectives.clear();
     objectives.push_back(objective1);
@@ -532,7 +532,7 @@ int main(int argc, char *argv[])
     //INIT-2, ASS-2, UPD-1
     start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
-    w_lsh = - 1.0;
+    //w_lsh = - 1.0;
     objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
     objectives.clear();
     objectives.push_back(objective1);
@@ -583,7 +583,7 @@ int main(int argc, char *argv[])
     //INIT-2, ASS-2, UPD-2
     start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus<double>(number_of_clusters, &vectors_array, &clusters);
-    w_lsh = - 1.0;
+    //w_lsh = - 1.0;
     objective1 = LSH_range_ass(&clusters, &vectors_array, diastaseis_vecs, number_of_vector_hash_tables, number_of_vector_hash_functions, &w_lsh);
     objectives.clear();
     objectives.push_back(objective1);
@@ -648,7 +648,7 @@ int main(int argc, char *argv[])
     double max_coord_lsh = twoelems.first;
     double w_lsh = - 1.0;
     std::vector<double> objectives;
-    
+
     //INIT-1, ASS-1, UPD-1
     auto start = std::chrono::high_resolution_clock::now();
     initialise_centers_curve(number_of_clusters, &curves_array, &clusters);
@@ -808,7 +808,7 @@ int main(int argc, char *argv[])
     //INIT-2, ASS-2, UPD-1
     start = std::chrono::high_resolution_clock::now();
     initialise_centers_plus_curve(number_of_clusters, &curves_array, &clusters);
-    w_lsh = - 1.0;
+    //w_lsh = - 1.0;
     objective1 = LSH_range_ass_curve(&clusters, &curves_array, number_of_grids, number_of_vector_hash_functions, delta, max_coord_lsh, &w_lsh);
     objectives.clear();
     objectives.push_back(objective1);
